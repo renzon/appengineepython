@@ -17,3 +17,8 @@ def ola(_resp, _req, nome, sobrenome):
     # Imprimindo parametros de requisição http
     _resp.write("Parametros: %s" % _req.arguments())
 
+@login_not_required
+@no_csrf
+def redirecionar(_handler):
+    url = r'/usuario/ola/Renzo/Nuccitelli'
+    _handler.redirect(url)
