@@ -12,5 +12,5 @@ def index(_resp):
 
 @login_not_required
 @no_csrf
-def ola(_resp, nome):
-    _resp.write("Olá %s" % nome)
+def ola(_resp, nome, sobrenome):
+    _resp.write("Olá %s %s" % (nome, sobrenome))
