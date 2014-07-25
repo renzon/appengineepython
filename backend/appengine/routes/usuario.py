@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 from gaecookie.decorator import no_csrf
 from gaepermission.decorator import login_not_required
+from tekton import router
 
 
 @login_not_required
@@ -17,8 +18,9 @@ def ola(_resp, _req, nome, sobrenome):
     # Imprimindo parametros de requisição http
     _resp.write("Parametros: %s" % _req.arguments())
 
+
 @login_not_required
 @no_csrf
 def redirecionar(_handler):
-    url = r'/usuario/ola/Renzo/Nuccitelli'
+    url = router.to_path(ola, 'Renzo', 'Nuccitelli')
     _handler.redirect(url)
