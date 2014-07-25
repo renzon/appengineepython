@@ -12,5 +12,8 @@ def index(_resp):
 
 @login_not_required
 @no_csrf
-def ola(_resp, nome, sobrenome):
+def ola(_resp, _req, nome, sobrenome):
     _resp.write("Olá %s %s" % (nome, sobrenome))
+    # Imprimindo parametros de requisição http
+    _resp.write("Parametros: %s" % _req.arguments())
+
