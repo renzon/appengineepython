@@ -8,5 +8,14 @@ from config.template_middleware import TemplateResponse
 @login_not_required
 @no_csrf
 def index():
-    return TemplateResponse()
+    class Curso(object):
+        def __init__(self, nome=''):
+            self.nome = nome
+
+    cursos = [Curso(nome) for nome in ('PyPrático',
+                                       'Objetos Pythônicos',
+                                       'Python para quem sabe Python')]
+
+    contexto = {'lista_cursos': cursos}
+    return TemplateResponse(contexto)
 
