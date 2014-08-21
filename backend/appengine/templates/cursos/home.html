@@ -1,0 +1,33 @@
+{% extends 'cursos/base.html' %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{% trans %}This is a generic home for curso_app {% endtrans %}  </h1>
+                {% if _logged_user and ('ADMIN' in _logged_user.groups) %}
+                <a href="{{ admin_path }}" class="btn btn-success">{% trans %}Admin{% endtrans %}</a>
+                {% endif %}
+                <hr/>
+                <h2>{% trans %}List of Cursos{% endtrans %}</h2>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>{% trans %}Titulo{% endtrans %}</th>
+                        <th>{% trans %}Preco{% endtrans %}</th>
+                        <th>{% trans %}Inicio{% endtrans %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for curso in cursos %}
+                        <tr>
+                            <td>{{ curso.titulo }}</td>
+                            <td>{{ curso.preco }}</td>
+                            <td>{{ curso.inicio }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

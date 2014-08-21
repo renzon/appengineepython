@@ -50,7 +50,7 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 {% macro select_tab(tab='') %}
-                    <li {{ 'class=active' if tab=='COURSES' }}><a href="/courses">{% trans %}Courses{% endtrans %}</a></li>
+                    <li {{ 'class=active' if tab=='CURSOS' }}><a href="/cursos">{% trans %}Cursos{% endtrans %}</a></li>
                     {% if _logged_user and 'ADMIN' in _logged_user.groups %}
                         <li {{ 'class=active' if tab=='ADMIN' }}><a href="/admin">{% trans %}Admin{% endtrans %}</a></li>
                     {% endif %}
