@@ -8,5 +8,5 @@ from config.template_middleware import TemplateResponse
 @login_not_required
 @no_csrf
 def index():
-    return TemplateResponse(template_path='/pagina.html')
+    return TemplateResponse()
 
