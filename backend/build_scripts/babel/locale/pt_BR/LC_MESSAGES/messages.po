@@ -273,7 +273,7 @@ msgstr ""
 
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/permission/home.html:22
 msgid "Secure"
-msgstr "Segur"
+msgstr "Seguro"
 
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/permission/home.html:22
 msgid "Unsecure"
