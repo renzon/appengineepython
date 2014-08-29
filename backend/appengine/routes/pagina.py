@@ -5,7 +5,6 @@ from gaepermission.decorator import login_not_required
 from config.template_middleware import TemplateResponse
 
 
-@login_not_required
 @no_csrf
 def index():
     class Curso(object):
