@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-07-25 17:10-0300\n"
+"POT-Creation-Date: 2014-08-29 17:52-0300\n"
 "PO-Revision-Date: 2014-06-26 00:14-0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en_US <LL@li.org>\n"
@@ -76,11 +76,11 @@ msgid "Sorry, page not found"
 msgstr ""
 
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/base/base.html:53
-msgid "Courses"
+msgid "Cursos"
 msgstr ""
 
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/base/base.html:55
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:8
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:8
 msgid "Admin"
 msgstr ""
 
@@ -92,75 +92,57 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:6
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:6
-msgid "This is a generic home for course_app "
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:6
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:6
+msgid "This is a generic home for curso_app "
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:11
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:9
-msgid "List of Courses"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:11
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:9
+msgid "List of Cursos"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:15
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:15
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:16
-msgid "D"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:15
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/form.html:15
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:16
+msgid "Titulo"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:16
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:16
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:17
-msgid "F"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:16
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/form.html:16
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:17
+msgid "Preco"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:17
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:17
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:18
-msgid "I"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/home.html:17
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/form.html:17
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:18
+msgid "Inicio"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:18
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:18
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:19
-msgid "Price"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/form.html:11
+msgid "Curso Form"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:19
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:19
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:20
-msgid "Start"
-msgstr ""
-
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/home.html:20
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:20
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:21
-msgid "Name"
-msgstr ""
-
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:11
-msgid "Course Form"
-msgstr ""
-
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/form.html:21
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/form.html:18
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/login/facebook/form.html:18
 #: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/login/passwordless/form.html:18
 msgid "Save"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:7
-msgid "Create New Course"
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:7
+msgid "Create New Curso"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:14
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:14
 msgid "Id"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:15
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:15
 msgid "Creation"
 msgstr ""
 
-#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/courses/admin/home.html:38
+#: /home/renzo/PycharmProjects/appengineepython/backend/appengine/templates/cursos/admin/home.html:32
 msgid "Are you sure to delete? Press cancel to avoid deletion."
 msgstr ""
 
@@ -341,5 +323,38 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Has %(len)s characters and it must have less than 500"
+#~ msgstr ""
+
+#~ msgid "Courses"
+#~ msgstr ""
+
+#~ msgid "This is a generic home for course_app "
+#~ msgstr ""
+
+#~ msgid "List of Courses"
+#~ msgstr ""
+
+#~ msgid "D"
+#~ msgstr ""
+
+#~ msgid "F"
+#~ msgstr ""
+
+#~ msgid "I"
+#~ msgstr ""
+
+#~ msgid "Price"
+#~ msgstr ""
+
+#~ msgid "Start"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr ""
+
+#~ msgid "Course Form"
+#~ msgstr ""
+
+#~ msgid "Create New Course"
 #~ msgstr ""
 
