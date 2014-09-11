@@ -66,7 +66,10 @@ def editar(livro_id, **propriedades):
 
 def deletar(livro_id):
     livro_chave = ndb.Key(Livro, int(livro_id))
-    livro_chave.delete()
+    query = AutorArco.find_origins(livro_chave)
+    chaves_a_serem_apagadas = query.fetch(keys_only=True)
+    chaves_a_serem_apagadas.append(livro_chave)
+    ndb.delete_multi(chaves_a_serem_apagadas)
     return RedirectResponse(router.to_path(index))
 
 
