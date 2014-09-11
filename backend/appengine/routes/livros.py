@@ -6,7 +6,7 @@ from google.appengine.ext import ndb
 from config.template_middleware import TemplateResponse
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
-from gaegraph.model import Node
+from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
 
@@ -23,6 +23,11 @@ class Livro(Node):
     @classmethod
     def query_listar_livros_ordenados_por_titulo(cls):
         return cls.query().order(Livro.titulo)
+
+
+class AutorArco(Arc):
+    origin = ndb.KeyProperty()  # Chave que irá referenciar o usuário
+    destination = ndb.KeyProperty(Livro)  # Chave que irá referenciar o livro
 
 
 # Formulários
