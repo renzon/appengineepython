@@ -27,6 +27,14 @@
                             <td>{{ livro.id }}</td>
                             <td>{{ livro.preco }}</td>
                             <td>{{ livro.lancamento }}</td>
+                            <td>
+                                <form action="{{ livro.deletar_path }}" method="post">
+                                    {{ csrf_input() }}
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>

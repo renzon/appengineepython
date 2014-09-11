@@ -59,6 +59,12 @@ def editar(livro_id, **propriedades):
     return RedirectResponse(router.to_path(index))
 
 
+def deletar(livro_id):
+    livro_chave = ndb.Key(Livro, int(livro_id))
+    livro_chave.delete()
+    return RedirectResponse(router.to_path(index))
+
+
 @no_csrf
 def index():
     query = Livro.query_listar_livros_ordenados_por_titulo()
@@ -67,6 +73,7 @@ def index():
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
     for livro in livros_dcts:
         livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
+        livro['deletar_path'] = router.to_path(deletar, livro['id'])
     context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
     return TemplateResponse(context)
 
