@@ -20,6 +20,10 @@ class Livro(Node):
     preco = property.SimpleCurrency(required=True)
     lancamento = ndb.DateProperty()
 
+    @classmethod
+    def query_listar_livros_ordenados_por_titulo(cls):
+        return cls.query().order(Livro.titulo)
+
 
 # Formulários
 
@@ -31,7 +35,7 @@ class LivroForm(ModelForm):
 # Handler de requisições HTTP
 @no_csrf
 def index():
-    query = Livro.query().order(Livro.titulo)
+    query = Livro.query_listar_livros_ordenados_por_titulo()
     livros = query.fetch()
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
