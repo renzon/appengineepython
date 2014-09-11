@@ -71,9 +71,11 @@ def deletar(livro_id):
 
 
 @no_csrf
-def index():
-    query = Livro.query_listar_livros_ordenados_por_titulo()
-    livros = query.fetch()
+def index(_logged_user):
+    query = AutorArco.find_destinations(_logged_user)
+    autores_arcos = query.fetch()
+    livros_chaves = [arco.destination for arco in autores_arcos]
+    livros = ndb.get_multi(livros_chaves)
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
     for livro in livros_dcts:
