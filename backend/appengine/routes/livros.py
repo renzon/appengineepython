@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-from decimal import Decimal
 
 from google.appengine.ext import ndb
+
 from config.template_middleware import TemplateResponse
 from gaecookie.decorator import no_csrf
-from gaeforms import base
+from gaeforms.ndb.form import ModelForm
 from gaegraph.model import Node
 from gaeforms.ndb import property
+
 
 # Classes de Modelo
 from tekton import router
@@ -21,10 +22,8 @@ class Livro(Node):
 
 # Formulários
 
-class LivroForm(base.Form):
-    titulo = base.StringField(required=True)
-    preco = base.DecimalField(required=True, lower=0)
-    lancamento = base.DateField()
+class LivroForm(ModelForm):
+    _model_class = Livro
 
 
 # Handler de requisições HTTP
@@ -42,6 +41,5 @@ def salvar(**propriedades):
                     'erros': erros,
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
-    propriedades_transformadas = livro_form.normalize()
-    livro = Livro(**propriedades_transformadas)
+    livro = livro_form.fill_model()
     livro.put()
