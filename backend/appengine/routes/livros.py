@@ -39,7 +39,8 @@ def salvar(**propriedades):
     erros = livro_form.validate()
     if erros:
         contexto = {'salvar_path': router.to_path(salvar),
-                    'erros': erros}
+                    'erros': erros,
+                    'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
     propriedades_transformadas = livro_form.normalize()
     livro = Livro(**propriedades_transformadas)

@@ -8,10 +8,11 @@
 
                     <form action="{{ salvar_path }}" method="post" role="form">
                         {% set erros = erros or None %}
+                        {% set livro = livro or None %}
                         {{ csrf_input() }}
-                        {{ form_input('Titulo','titulo','',erros.titulo) }}
-                        {{ form_input('Preco','preco','',erros.preco) }}
-                        {{ form_input('Lançamento','lancamento','',erros.lancamento) }}
+                        {{ form_input('Titulo', 'titulo', livro.titulo, erros.titulo) }}
+                        {{ form_input('Preco', 'preco', livro.preco, erros.preco) }}
+                        {{ form_input('Lançamento', 'lancamento', livro.lancamento, erros.lancamento) }}
                         <button type="submit" class="btn btn-success">Salvar</button>
                     </form>
                 </div>
