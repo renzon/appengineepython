@@ -31,3 +31,8 @@ indexes:
   properties:
   - name: class
   - name: email
+
+- kind: Node
+  properties:
+  - name: class
+  - name: titulo

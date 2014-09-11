@@ -12,6 +12,7 @@ from gaeforms.ndb import property
 
 # Classes de Modelo
 from tekton import router
+from tekton.gae.middleware.redirect import RedirectResponse
 
 
 class Livro(Node):
@@ -29,6 +30,16 @@ class LivroForm(ModelForm):
 
 # Handler de requisições HTTP
 @no_csrf
+def index():
+    query = Livro.query().order(Livro.titulo)
+    livros = query.fetch()
+    livro_form = LivroForm()
+    livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
+    context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
+    return TemplateResponse(context)
+
+
+@no_csrf
 def form():
     contexto = {'salvar_path': router.to_path(salvar)}
     return TemplateResponse(contexto)
@@ -44,3 +55,4 @@ def salvar(**propriedades):
         return TemplateResponse(contexto, 'livros/form.html')
     livro = livro_form.fill_model()
     livro.put()
+    return RedirectResponse(router.to_path(index))
