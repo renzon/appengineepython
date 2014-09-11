@@ -24,6 +24,7 @@ class Livro(Node):
 
 class LivroForm(ModelForm):
     _model_class = Livro
+    _exclude = [Livro.creation]
 
 
 # Handler de requisições HTTP
