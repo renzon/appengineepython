@@ -89,7 +89,7 @@ def form():
     return TemplateResponse(contexto)
 
 
-def salvar(**propriedades):
+def salvar(_logged_user, **propriedades):
     livro_form = LivroForm(**propriedades)
     erros = livro_form.validate()
     if erros:
@@ -98,5 +98,7 @@ def salvar(**propriedades):
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
     livro = livro_form.fill_model()
-    livro.put()
+    chave_do_livro = livro.put()
+    autor_arco = AutorArco(origin=_logged_user.key, destination=chave_do_livro)
+    autor_arco.put()
     return RedirectResponse(router.to_path(index))
