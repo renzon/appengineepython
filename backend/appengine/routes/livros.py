@@ -33,12 +33,40 @@ class LivroForm(ModelForm):
 
 
 # Handler de requisições HTTP
+
+@no_csrf
+def form_edicao(livro_id):
+    livro_id = int(livro_id)
+    livro = Livro.get_by_id(livro_id)
+    livro_form = LivroForm()
+    livro_dct = livro_form.fill_with_model(livro)
+    contexto = {'salvar_path': router.to_path(editar, livro_id),
+                'livro': livro_dct}
+    return TemplateResponse(contexto, 'livros/form.html')
+
+
+def editar(livro_id, **propriedades):
+    livro_form = LivroForm(**propriedades)
+    erros = livro_form.validate()
+    if erros:
+        contexto = {'salvar_path': router.to_path(editar, livro_id),
+                    'erros': erros,
+                    'livro': propriedades}
+        return TemplateResponse(contexto, 'livros/form.html')
+    livro = Livro.get_by_id(int(livro_id))
+    livro_form.fill_model(livro)
+    livro.put()
+    return RedirectResponse(router.to_path(index))
+
+
 @no_csrf
 def index():
     query = Livro.query_listar_livros_ordenados_por_titulo()
     livros = query.fetch()
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
+    for livro in livros_dcts:
+        livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
     context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
     return TemplateResponse(context)
 
