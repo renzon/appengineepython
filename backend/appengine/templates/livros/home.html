@@ -13,6 +13,7 @@
                         <th>Id</th>
                         <th>Preco</th>
                         <th>Lançamento</th>
+                        <th>Autor</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -27,6 +28,7 @@
                             <td>{{ livro.id }}</td>
                             <td>{{ livro.preco }}</td>
                             <td>{{ livro.lancamento }}</td>
+                            <td>{{ livro.autor.name }}</td>
                             <td>
                                 <form action="{{ livro.deletar_path }}" method="post">
                                     {{ csrf_input() }}

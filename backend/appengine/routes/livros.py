@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
+from itertools import izip
 
 from google.appengine.ext import ndb
 
@@ -26,7 +27,7 @@ class Livro(Node):
 
 
 class AutorArco(Arc):
-    origin = ndb.KeyProperty()  # Chave que irá referenciar o usuário
+    origin = ndb.KeyProperty(Node)  # Chave que irá referenciar o usuário
     destination = ndb.KeyProperty(Livro)  # Chave que irá referenciar o livro
 
 
@@ -74,16 +75,18 @@ def deletar(livro_id):
 
 
 @no_csrf
-def index(_logged_user):
-    query = AutorArco.find_destinations(_logged_user)
-    autores_arcos = query.fetch()
-    livros_chaves = [arco.destination for arco in autores_arcos]
-    livros = ndb.get_multi(livros_chaves)
+def index():
+    livros = Livro.query_listar_livros_ordenados_por_titulo().fetch()
+    autores_queries = [AutorArco.find_origins(livro) for livro in livros]
+    autores_arcos = [q.get() for q in autores_queries]  # Tempo de execução proporcional ao número de livros
+    autores_keys = [arco.origin for arco in autores_arcos]
+    autores = ndb.get_multi(autores_keys)
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
-    for livro in livros_dcts:
+    for livro, autor in izip(livros_dcts, autores):
         livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
         livro['deletar_path'] = router.to_path(deletar, livro['id'])
+        livro['autor'] = autor
     context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
     return TemplateResponse(context)
 
