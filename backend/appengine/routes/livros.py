@@ -5,8 +5,8 @@ from itertools import izip
 from google.appengine.ext import ndb
 
 from config.template_middleware import TemplateResponse
-from gaebusiness.business import Command, CommandParallel, CommandSequential
-from gaebusiness.gaeutil import ModelSearchCommand
+from gaebusiness.business import Command, CommandParallel, CommandSequential, CommandExecutionException
+from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
 from gaegraph.business_base import SingleOriginSearch
@@ -42,6 +42,10 @@ class LivroForm(ModelForm):
 
 
 # Comandos
+
+class SalvarLivroCmd(SaveCommand):
+    _model_form_class = LivroForm
+
 
 class ListarLivrosOrdenadosPorTituloCmd(ModelSearchCommand):
     def __init__(self):
@@ -140,15 +144,16 @@ def form():
 
 
 def salvar(_logged_user, **propriedades):
-    livro_form = LivroForm(**propriedades)
-    erros = livro_form.validate()
-    if erros:
+    salvar_livro_cmd = SalvarLivroCmd(**propriedades)
+    try:
+        livro=salvar_livro_cmd()
+        autor_arco = AutorArco(origin=_logged_user.key, destination=livro)
+        autor_arco.put()
+        return RedirectResponse(router.to_path(index))
+    except CommandExecutionException:
         contexto = {'salvar_path': router.to_path(salvar),
-                    'erros': erros,
+                    'erros': salvar_livro_cmd.errors,
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
-    livro = livro_form.fill_model()
-    chave_do_livro = livro.put()
-    autor_arco = AutorArco(origin=_logged_user.key, destination=chave_do_livro)
-    autor_arco.put()
-    return RedirectResponse(router.to_path(index))
+
+
