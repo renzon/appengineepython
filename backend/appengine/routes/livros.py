@@ -5,6 +5,7 @@ from itertools import izip
 from google.appengine.ext import ndb
 
 from config.template_middleware import TemplateResponse
+from gaebusiness.business import Command
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
 from gaegraph.model import Node, Arc
@@ -38,7 +39,41 @@ class LivroForm(ModelForm):
     _include = [Livro.titulo, Livro.preco, Livro.lancamento]
 
 
-# Handler de requisições HTTP
+# Comandos
+
+class ListarLivrosOrdenadosPorTituloCmd(Command):
+    def __init__(self):
+        super(ListarLivrosOrdenadosPorTituloCmd, self).__init__()
+        self.__livros_future = None
+
+    def set_up(self):
+        self.__livros_future = Livro.query_listar_livros_ordenados_por_titulo().fetch_async()
+
+    def do_business(self):
+        self.result = self.__livros_future.get_result()
+
+
+# Handlers de requisições HTTP
+
+@no_csrf
+def index():
+    listar_livros_cmd = ListarLivrosOrdenadosPorTituloCmd()
+    listar_livros_cmd.execute()
+    livros = listar_livros_cmd.result
+    autores_queries = [AutorArco.find_origins(livro) for livro in livros]
+    autores_arcos_futures = [q.get_async() for q in autores_queries]  # Tempo igual ao tempo de uma busca
+    autores_arcos = [arco_future.get_result() for arco_future in autores_arcos_futures]
+    autores_keys = [arco.origin for arco in autores_arcos]
+    autores = ndb.get_multi(autores_keys)
+    livro_form = LivroForm()
+    livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
+    for livro, autor in izip(livros_dcts, autores):
+        livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
+        livro['deletar_path'] = router.to_path(deletar, livro['id'])
+        livro['autor'] = autor
+    context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
+    return TemplateResponse(context)
+
 
 @no_csrf
 def form_edicao(livro_id):
@@ -72,24 +107,6 @@ def deletar(livro_id):
     chaves_a_serem_apagadas.append(livro_chave)
     ndb.delete_multi(chaves_a_serem_apagadas)
     return RedirectResponse(router.to_path(index))
-
-
-@no_csrf
-def index():
-    livros = Livro.query_listar_livros_ordenados_por_titulo().fetch()
-    autores_queries = [AutorArco.find_origins(livro) for livro in livros]
-    autores_arcos_futures = [q.get_async() for q in autores_queries]  # Tempo igual ao tempo de uma busca
-    autores_arcos = [arco_future.get_result() for arco_future in autores_arcos_futures]
-    autores_keys = [arco.origin for arco in autores_arcos]
-    autores = ndb.get_multi(autores_keys)
-    livro_form = LivroForm()
-    livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
-    for livro, autor in izip(livros_dcts, autores):
-        livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
-        livro['deletar_path'] = router.to_path(deletar, livro['id'])
-        livro['autor'] = autor
-    context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
-    return TemplateResponse(context)
 
 
 @no_csrf
