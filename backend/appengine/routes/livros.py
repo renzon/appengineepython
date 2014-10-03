@@ -5,7 +5,7 @@ from itertools import izip
 from google.appengine.ext import ndb
 
 from config.template_middleware import TemplateResponse
-from gaebusiness.business import Command, CommandParallel
+from gaebusiness.business import Command, CommandParallel, CommandSequential
 from gaebusiness.gaeutil import ModelSearchCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
@@ -58,25 +58,43 @@ class BuscarAutoresCmd(CommandParallel):
         autores_cmds = [BuscarAutor(livro) for livro in livros]
         super(BuscarAutoresCmd, self).__init__(*autores_cmds)
 
+    def handle_previous(self, command):
+        autores_cmds = [BuscarAutor(livro) for livro in command.result]
+        self.extend(autores_cmds)
+
     def do_business(self):
         super(BuscarAutoresCmd, self).do_business()
         self.result = [cmd.result for cmd in self]
+
+
+class ListarLivrosPorTituloComAutor(CommandSequential):
+    def __init__(self):
+        self.__listar_livros_cmd = ListarLivrosOrdenadosPorTituloCmd()
+        self.__buscar_autores_cmd = BuscarAutoresCmd()
+        super(ListarLivrosPorTituloComAutor, self).__init__(self.__listar_livros_cmd,
+                                                            self.__buscar_autores_cmd)
+
+    def do_business(self):
+        super(ListarLivrosPorTituloComAutor, self).do_business()
+        # Iterar nos livros e acrescentar seus autores
+        for livro, autor in izip(self.__listar_livros_cmd.result, self.__buscar_autores_cmd.result):
+            livro.autor = autor
+        self.result = self.__listar_livros_cmd.result
 
 
 # Handlers de requisições HTTP
 
 @no_csrf
 def index():
-    listar_livros_cmd = ListarLivrosOrdenadosPorTituloCmd()
-    livros = listar_livros_cmd()
-    buscar_autores_cmd = BuscarAutoresCmd(*livros)
-    autores = buscar_autores_cmd()
+    listar_livros_cmd = ListarLivrosPorTituloComAutor()
     livro_form = LivroForm()
-    livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
-    for livro, autor in izip(livros_dcts, autores):
-        livro['form_edicao_path'] = router.to_path(form_edicao, livro['id'])
-        livro['deletar_path'] = router.to_path(deletar, livro['id'])
-        livro['autor'] = autor
+    livros_dcts = []
+    for livro in listar_livros_cmd():
+        dct = livro_form.fill_with_model(livro)
+        dct['form_edicao_path'] = router.to_path(form_edicao, dct['id'])
+        dct['deletar_path'] = router.to_path(deletar, dct['id'])
+        dct['autor'] = livro.autor
+        livros_dcts.append(dct)
     context = {'livros': livros_dcts, 'livro_form_path': router.to_path(form)}
     return TemplateResponse(context)
 
