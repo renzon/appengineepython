@@ -53,16 +53,24 @@ class BuscarAutor(SingleOriginSearch):
         super(BuscarAutor, self).__init__(AutorArco, livro)
 
 
+class BuscarAutoresCmd(CommandParallel):
+    def __init__(self, *livros):
+        autores_cmds = [BuscarAutor(livro) for livro in livros]
+        super(BuscarAutoresCmd, self).__init__(*autores_cmds)
+
+    def do_business(self):
+        super(BuscarAutoresCmd, self).do_business()
+        self.result = [cmd.result for cmd in self]
+
+
 # Handlers de requisições HTTP
 
 @no_csrf
 def index():
     listar_livros_cmd = ListarLivrosOrdenadosPorTituloCmd()
     livros = listar_livros_cmd()
-    autores_arcos_cmds = [BuscarAutor(livro) for livro in livros]
-    comandos_em_paralelo = CommandParallel(*autores_arcos_cmds)
-    comandos_em_paralelo.execute()
-    autores = [cmd.result for cmd in comandos_em_paralelo]
+    buscar_autores_cmd = BuscarAutoresCmd(*livros)
+    autores = buscar_autores_cmd()
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
     for livro, autor in izip(livros_dcts, autores):
