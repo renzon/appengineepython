@@ -5,9 +5,11 @@ from itertools import izip
 from google.appengine.ext import ndb
 
 from config.template_middleware import TemplateResponse
-from gaebusiness.business import Command
+from gaebusiness.business import Command, CommandParallel
+from gaebusiness.gaeutil import ModelSearchCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
+from gaegraph.business_base import SingleOriginSearch
 from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
@@ -41,16 +43,14 @@ class LivroForm(ModelForm):
 
 # Comandos
 
-class ListarLivrosOrdenadosPorTituloCmd(Command):
+class ListarLivrosOrdenadosPorTituloCmd(ModelSearchCommand):
     def __init__(self):
-        super(ListarLivrosOrdenadosPorTituloCmd, self).__init__()
-        self.__livros_future = None
+        super(ListarLivrosOrdenadosPorTituloCmd, self).__init__(Livro.query_listar_livros_ordenados_por_titulo())
 
-    def set_up(self):
-        self.__livros_future = Livro.query_listar_livros_ordenados_por_titulo().fetch_async()
 
-    def do_business(self):
-        self.result = self.__livros_future.get_result()
+class BuscarAutor(SingleOriginSearch):
+    def __init__(self, livro):
+        super(BuscarAutor, self).__init__(AutorArco, livro)
 
 
 # Handlers de requisições HTTP
@@ -58,13 +58,11 @@ class ListarLivrosOrdenadosPorTituloCmd(Command):
 @no_csrf
 def index():
     listar_livros_cmd = ListarLivrosOrdenadosPorTituloCmd()
-    listar_livros_cmd.execute()
-    livros = listar_livros_cmd.result
-    autores_queries = [AutorArco.find_origins(livro) for livro in livros]
-    autores_arcos_futures = [q.get_async() for q in autores_queries]  # Tempo igual ao tempo de uma busca
-    autores_arcos = [arco_future.get_result() for arco_future in autores_arcos_futures]
-    autores_keys = [arco.origin for arco in autores_arcos]
-    autores = ndb.get_multi(autores_keys)
+    livros = listar_livros_cmd()
+    autores_arcos_cmds = [BuscarAutor(livro) for livro in livros]
+    comandos_em_paralelo = CommandParallel(*autores_arcos_cmds)
+    comandos_em_paralelo.execute()
+    autores = [cmd.result for cmd in comandos_em_paralelo]
     livro_form = LivroForm()
     livros_dcts = [livro_form.fill_with_model(livro) for livro in livros]
     for livro, autor in izip(livros_dcts, autores):
