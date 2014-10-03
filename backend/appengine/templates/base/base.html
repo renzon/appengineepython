@@ -19,6 +19,7 @@
 
     <title>{% block title %}Tekton Fullstrack{% endblock %}</title>
     <!-- Bootstrap -->
+
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/default.css" rel="stylesheet">
     <style>
@@ -27,6 +28,8 @@
             color: #777
         }
     </style>
+    <script src="/static/jquery/js/jquery-1.11.1.min.js"></script>
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -50,10 +53,11 @@
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 {% macro select_tab(tab='') %}
-                    <li {{ 'class=active' if tab=='CURSOS' }}><a href="/cursos">{% trans %}Cursos{% endtrans %}</a></li>
-                    <li {{ 'class=active' if tab=='LIVROS' }}><a href="/livros">Livros</a></li>
+                    <li {{ 'class=active' if tab=='COURSES' }}><a href="/courses">{% trans %}Courses{% endtrans %}</a>
+                    </li>
                     {% if _logged_user and 'ADMIN' in _logged_user.groups %}
-                        <li {{ 'class=active' if tab=='ADMIN' }}><a href="/admin">{% trans %}Admin{% endtrans %}</a></li>
+                        <li {{ 'class=active' if tab=='ADMIN' }}><a href="/admin">{% trans %}Admin{% endtrans %}</a>
+                        </li>
                     {% endif %}
                 {% endmacro %}
                 {% block tabs %}
@@ -62,15 +66,24 @@
             </ul>
             <div class="nav navbar-nav pull-right pad8">
                 {% if _logged_user %}
-
-                    <form class="form-inline" action="{{ _logout_path }}" method="post">
-                        <div class="input-append" id="logout-div">
-                            <span>{{ _logged_user.email }}</span>
-                            <button class="btn btn-danger" type="submit">{% trans %}Logout{% endtrans %}</button>
-                            {{ csrf_input() }}
-                        </div>
-                    </form>
-
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                                data-toggle="dropdown">
+                            {{ _logged_user.name }}
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="/account">{% trans %}Account{% endtrans %}</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation">
+                                <form action="{{ _logout_path }}" method="post" class="text-center">
+                                    <button class="btn btn-danger" type="submit">{% trans %}
+                                        Logout{% endtrans %}</button>
+                                    {{ csrf_input() }}
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
                 {% else %}
                     <a class="btn btn-success" href="{{ _login_path }}">{% trans %}Login{% endtrans %}</a>
 
@@ -83,7 +96,9 @@
 {% block body %}{% endblock %}
 <div class="footer">
     <div class="container">
-        <p class="text-muted text-right">Tekton Full-Stack: <a target="_blank" href="https://github.com/renzon/tekton-fullstack">Git Hub</a></p>
+        <p class="text-muted text-right">Tekton Full-Stack: <a target="_blank"
+                                                               href="https://github.com/renzon/tekton-fullstack">Git
+            Hub</a></p>
     </div>
 </div>
 </body>

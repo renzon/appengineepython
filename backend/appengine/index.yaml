@@ -13,12 +13,6 @@ indexes:
 - kind: Arc
   properties:
   - name: class
-  - name: destination
-  - name: creation
-
-- kind: Arc
-  properties:
-  - name: class
   - name: origin
   - name: creation
 
@@ -37,8 +31,3 @@ indexes:
   properties:
   - name: class
   - name: email
-
-- kind: Node
-  properties:
-  - name: class
-  - name: titulo
