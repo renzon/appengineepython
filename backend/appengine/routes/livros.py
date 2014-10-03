@@ -9,7 +9,7 @@ from gaebusiness.business import Command, CommandParallel, CommandSequential, Co
 from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
-from gaegraph.business_base import SingleOriginSearch
+from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc
 from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
@@ -45,6 +45,11 @@ class LivroForm(ModelForm):
 
 class SalvarLivroCmd(SaveCommand):
     _model_form_class = LivroForm
+
+
+class SalvarLivroComAutor(CreateSingleOriginArc):
+    def __init__(self, origin, destination):
+        super(SalvarLivroComAutor, self).__init__(AutorArco, origin, destination)
 
 
 class ListarLivrosOrdenadosPorTituloCmd(ModelSearchCommand):
@@ -145,10 +150,9 @@ def form():
 
 def salvar(_logged_user, **propriedades):
     salvar_livro_cmd = SalvarLivroCmd(**propriedades)
+    salvar_livro_com_autor = SalvarLivroComAutor(_logged_user, salvar_livro_cmd)
     try:
-        livro=salvar_livro_cmd()
-        autor_arco = AutorArco(origin=_logged_user.key, destination=livro)
-        autor_arco.put()
+        salvar_livro_com_autor()
         return RedirectResponse(router.to_path(index))
     except CommandExecutionException:
         contexto = {'salvar_path': router.to_path(salvar),
