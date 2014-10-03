@@ -78,7 +78,8 @@ def deletar(livro_id):
 def index():
     livros = Livro.query_listar_livros_ordenados_por_titulo().fetch()
     autores_queries = [AutorArco.find_origins(livro) for livro in livros]
-    autores_arcos = [q.get() for q in autores_queries]  # Tempo de execução proporcional ao número de livros
+    autores_arcos_futures = [q.get_async() for q in autores_queries]  # Tempo igual ao tempo de uma busca
+    autores_arcos = [arco_future.get_result() for arco_future in autores_arcos_futures]
     autores_keys = [arco.origin for arco in autores_arcos]
     autores = ndb.get_multi(autores_keys)
     livro_form = LivroForm()
