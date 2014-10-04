@@ -9,7 +9,7 @@ from gaebusiness.business import Command, CommandParallel, CommandSequential, Co
 from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
-from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc
+from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc, NodeSearch
 from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
@@ -42,6 +42,9 @@ class LivroForm(ModelForm):
 
 
 # Comandos
+
+class BuscarLivroPorIdCmd(NodeSearch):
+    _model_class = Livro
 
 class SalvarLivroCmd(SaveCommand):
     _model_form_class = LivroForm
@@ -110,8 +113,8 @@ def index():
 
 @no_csrf
 def form_edicao(livro_id):
-    livro_id = int(livro_id)
-    livro = Livro.get_by_id(livro_id)
+    buscar_livro_cmd=BuscarLivroPorIdCmd(livro_id)
+    livro = buscar_livro_cmd()
     livro_form = LivroForm()
     livro_dct = livro_form.fill_with_model(livro)
     contexto = {'salvar_path': router.to_path(editar, livro_id),
