@@ -6,10 +6,10 @@ from google.appengine.ext import ndb
 
 from config.template_middleware import TemplateResponse
 from gaebusiness.business import Command, CommandParallel, CommandSequential, CommandExecutionException
-from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand
+from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand, UpdateCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
-from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc, NodeSearch
+from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc, NodeSearch, UpdateNode
 from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
@@ -46,7 +46,12 @@ class LivroForm(ModelForm):
 class BuscarLivroPorIdCmd(NodeSearch):
     _model_class = Livro
 
+
 class SalvarLivroCmd(SaveCommand):
+    _model_form_class = LivroForm
+
+
+class AtualizarLivroCmd(UpdateNode):
     _model_form_class = LivroForm
 
 
@@ -113,7 +118,7 @@ def index():
 
 @no_csrf
 def form_edicao(livro_id):
-    buscar_livro_cmd=BuscarLivroPorIdCmd(livro_id)
+    buscar_livro_cmd = BuscarLivroPorIdCmd(livro_id)
     livro = buscar_livro_cmd()
     livro_form = LivroForm()
     livro_dct = livro_form.fill_with_model(livro)
@@ -123,17 +128,15 @@ def form_edicao(livro_id):
 
 
 def editar(livro_id, **propriedades):
-    livro_form = LivroForm(**propriedades)
-    erros = livro_form.validate()
-    if erros:
-        contexto = {'salvar_path': router.to_path(editar, livro_id),
-                    'erros': erros,
+    atualizar_livro_cmd = AtualizarLivroCmd(livro_id, **propriedades)
+    try:
+        atualizar_livro_cmd()
+        return RedirectResponse(router.to_path(index))
+    except CommandExecutionException:
+        contexto = {'salvar_path': router.to_path(editar),
+                    'erros': atualizar_livro_cmd.errors,
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
-    livro = Livro.get_by_id(int(livro_id))
-    livro_form.fill_model(livro)
-    livro.put()
-    return RedirectResponse(router.to_path(index))
 
 
 def deletar(livro_id):
