@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-from livro_app.livro_commands import ListarLivrosOrdenadosPorTituloCmd, ListarLivrosPorTituloComAutor, LivroForm, \
+from livro_app.livro_commands import ListarLivrosPorTituloComAutor, LivroForm, \
     BuscarLivroPorIdCmd, SalvarLivroCmd, SalvarLivroComAutor, AtualizarLivroCmd, ApagarLivroCmd
 
 
