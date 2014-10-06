@@ -6,9 +6,7 @@ from gaebusiness.business import CommandExecutionException
 from gaecookie.decorator import no_csrf
 
 
-# Classes de Modelo
-from livro_app.livro_commands import ListarLivrosPorTituloComAutor, LivroForm, BuscarLivroPorIdCmd, AtualizarLivroCmd, \
-    ApagarLivroCmd, SalvarLivroCmd, SalvarLivroComAutor
+from livro_app import livro_facade
 from tekton import router
 from tekton.gae.middleware.redirect import RedirectResponse
 
@@ -22,7 +20,7 @@ from tekton.gae.middleware.redirect import RedirectResponse
 
 @no_csrf
 def index():
-    listar_livros_cmd = ListarLivrosPorTituloComAutor()
+    listar_livros_cmd = livro_facade.listar_livros_por_titulo_com_autor()
     livro_form = LivroForm()
     livros_dcts = []
     for livro in listar_livros_cmd():
