@@ -36,12 +36,12 @@ def form_edicao(livro_id):
 
 
 def editar(livro_id, **propriedades):
-    atualizar_livro_cmd = AtualizarLivroCmd(livro_id, **propriedades)
+    atualizar_livro_cmd = livro_facade.atualizar_livro_cmd(livro_id, **propriedades)
     try:
         atualizar_livro_cmd()
         return RedirectResponse(router.to_path(index))
     except CommandExecutionException:
-        contexto = {'salvar_path': router.to_path(editar),
+        contexto = {'salvar_path': router.to_path(editar,livro_id),
                     'erros': atualizar_livro_cmd.errors,
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
