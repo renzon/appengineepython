@@ -41,14 +41,14 @@ def editar(livro_id, **propriedades):
         atualizar_livro_cmd()
         return RedirectResponse(router.to_path(index))
     except CommandExecutionException:
-        contexto = {'salvar_path': router.to_path(editar,livro_id),
+        contexto = {'salvar_path': router.to_path(editar, livro_id),
                     'erros': atualizar_livro_cmd.errors,
                     'livro': propriedades}
         return TemplateResponse(contexto, 'livros/form.html')
 
 
 def deletar(livro_id):
-    apagar_livro_cmd = ApagarLivroCmd(livro_id)
+    apagar_livro_cmd = livro_facade.apagar_livro_cmd(livro_id)
     apagar_livro_cmd()
     return RedirectResponse(router.to_path(index))
 
@@ -61,7 +61,7 @@ def form():
 
 def salvar(_logged_user, **propriedades):
     salvar_livro_cmd = livro_facade.salvar_livro_cmd(**propriedades)
-    salvar_livro_com_autor = livro_facade.salvar_livro_com_autor_cmd(_logged_user,salvar_livro_cmd)
+    salvar_livro_com_autor = livro_facade.salvar_livro_com_autor_cmd(_logged_user, salvar_livro_cmd)
     try:
         salvar_livro_com_autor()
         return RedirectResponse(router.to_path(index))

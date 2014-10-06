@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 from livro_app.livro_commands import ListarLivrosOrdenadosPorTituloCmd, ListarLivrosPorTituloComAutor, LivroForm, \
-    BuscarLivroPorIdCmd, SalvarLivroCmd, SalvarLivroComAutor, AtualizarLivroCmd
+    BuscarLivroPorIdCmd, SalvarLivroCmd, SalvarLivroComAutor, AtualizarLivroCmd, ApagarLivroCmd
 
 
 def listar_livros_por_titulo_com_autor_cmd():
@@ -31,3 +31,7 @@ def salvar_livro_com_autor_cmd(autor, salvar_livro_cmd):
 
 def atualizar_livro_cmd(livro_id, **propriedades):
     return AtualizarLivroCmd(livro_id, **propriedades)
+
+
+def apagar_livro_cmd(livro_id):
+    return ApagarLivroCmd(livro_id)
