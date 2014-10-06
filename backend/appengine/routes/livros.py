@@ -26,9 +26,9 @@ def index():
 
 @no_csrf
 def form_edicao(livro_id):
-    buscar_livro_cmd = BuscarLivroPorIdCmd(livro_id)
+    buscar_livro_cmd = livro_facade.buscar_livro_por_id(livro_id)
     livro = buscar_livro_cmd()
-    livro_form = LivroForm()
+    livro_form = livro_facade.livro_form()
     livro_dct = livro_form.fill_with_model(livro)
     contexto = {'salvar_path': router.to_path(editar, livro_id),
                 'livro': livro_dct}
