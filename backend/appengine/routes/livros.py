@@ -9,7 +9,8 @@ from gaebusiness.business import Command, CommandParallel, CommandSequential, Co
 from gaebusiness.gaeutil import ModelSearchCommand, SaveCommand, UpdateCommand
 from gaecookie.decorator import no_csrf
 from gaeforms.ndb.form import ModelForm
-from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc, NodeSearch, UpdateNode
+from gaegraph.business_base import SingleOriginSearch, CreateArc, CreateSingleOriginArc, NodeSearch, UpdateNode, \
+    DeleteNode, DeleteArcs
 from gaegraph.model import Node, Arc
 from gaeforms.ndb import property
 
@@ -42,6 +43,17 @@ class LivroForm(ModelForm):
 
 
 # Comandos
+class ApagarAutorArcoCmd(DeleteArcs):
+    def __init__(self, livro):
+        super(ApagarAutorArcoCmd, self).__init__(AutorArco, destination=livro)
+
+
+class ApagarLivroCmd(CommandParallel):
+    def __init__(self, livro):
+        delete_cmd = DeleteNode(livro)
+        apagar_autor_arco_cmd = ApagarAutorArcoCmd(livro)
+        super(ApagarLivroCmd, self).__init__(delete_cmd, apagar_autor_arco_cmd)
+
 
 class BuscarLivroPorIdCmd(NodeSearch):
     _model_class = Livro
@@ -140,11 +152,8 @@ def editar(livro_id, **propriedades):
 
 
 def deletar(livro_id):
-    livro_chave = ndb.Key(Livro, int(livro_id))
-    query = AutorArco.find_origins(livro_chave)
-    chaves_a_serem_apagadas = query.fetch(keys_only=True)
-    chaves_a_serem_apagadas.append(livro_chave)
-    ndb.delete_multi(chaves_a_serem_apagadas)
+    apagar_livro_cmd = ApagarLivroCmd(livro_id)
+    apagar_livro_cmd()
     return RedirectResponse(router.to_path(index))
 
 
