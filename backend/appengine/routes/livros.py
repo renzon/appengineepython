@@ -4,24 +4,15 @@ from __future__ import absolute_import, unicode_literals
 from config.template_middleware import TemplateResponse
 from gaebusiness.business import CommandExecutionException
 from gaecookie.decorator import no_csrf
-
-
 from livro_app import livro_facade
 from tekton import router
 from tekton.gae.middleware.redirect import RedirectResponse
 
 
-
-
-
-
-
-# Handlers de requisições HTTP
-
 @no_csrf
 def index():
     listar_livros_cmd = livro_facade.listar_livros_por_titulo_com_autor()
-    livro_form = LivroForm()
+    livro_form = livro_facade.livro_form()
     livros_dcts = []
     for livro in listar_livros_cmd():
         dct = livro_form.fill_with_model(livro)

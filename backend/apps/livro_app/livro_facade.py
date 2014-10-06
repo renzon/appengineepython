@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-from livro_app.livro_commands import ListarLivrosOrdenadosPorTituloCmd, ListarLivrosPorTituloComAutor
+from livro_app.livro_commands import ListarLivrosOrdenadosPorTituloCmd, ListarLivrosPorTituloComAutor, LivroForm
 
 
 def listar_livros_por_titulo_com_autor():
@@ -10,3 +10,7 @@ def listar_livros_por_titulo_com_autor():
     :return: Comando que retorna livros quando executado
     """
     return ListarLivrosPorTituloComAutor()
+
+
+def livro_form(**propriedades):
+    return LivroForm(**propriedades)
