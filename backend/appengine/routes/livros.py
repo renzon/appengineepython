@@ -11,7 +11,7 @@ from tekton.gae.middleware.redirect import RedirectResponse
 
 @no_csrf
 def index():
-    listar_livros_cmd = livro_facade.listar_livros_por_titulo_com_autor()
+    listar_livros_cmd = livro_facade.listar_livros_por_titulo_com_autor_cmd()
     livro_form = livro_facade.livro_form()
     livros_dcts = []
     for livro in listar_livros_cmd():
@@ -26,7 +26,7 @@ def index():
 
 @no_csrf
 def form_edicao(livro_id):
-    buscar_livro_cmd = livro_facade.buscar_livro_por_id(livro_id)
+    buscar_livro_cmd = livro_facade.buscar_livro_por_id_cmd(livro_id)
     livro = buscar_livro_cmd()
     livro_form = livro_facade.livro_form()
     livro_dct = livro_form.fill_with_model(livro)
@@ -60,8 +60,8 @@ def form():
 
 
 def salvar(_logged_user, **propriedades):
-    salvar_livro_cmd = SalvarLivroCmd(**propriedades)
-    salvar_livro_com_autor = SalvarLivroComAutor(_logged_user, salvar_livro_cmd)
+    salvar_livro_cmd = livro_facade.salvar_livro_cmd(**propriedades)
+    salvar_livro_com_autor = livro_facade.salvar_livro_com_autor_cmd(_logged_user,salvar_livro_cmd)
     try:
         salvar_livro_com_autor()
         return RedirectResponse(router.to_path(index))
