@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 from gaegraph.business_base import NodeSearch, DeleteNode
-from curso_app.commands import ListCursoCommand, SaveCursoCommand, UpdateCursoCommand, \
-    CursoPublicForm, CursoDetailForm, CursoShortForm
+from curso_app.curso_commands import ListCursoCommand, SaveCursoCommand, UpdateCursoCommand, CursoForm
 
 
 def save_curso_cmd(**curso_properties):
@@ -31,30 +30,13 @@ def list_cursos_cmd():
     return ListCursoCommand()
 
 
-def curso_detail_form(**kwargs):
+def curso_form(**kwargs):
     """
     Function to get Curso's detail form.
     :param kwargs: form properties
     :return: Form
     """
-    return CursoDetailForm(**kwargs)
-
-
-def curso_short_form(**kwargs):
-    """
-    Function to get Curso's short form. just a subset of curso's properties
-    :param kwargs: form properties
-    :return: Form
-    """
-    return CursoShortForm(**kwargs)
-
-def curso_public_form(**kwargs):
-    """
-    Function to get Curso'spublic form. just a subset of curso's properties
-    :param kwargs: form properties
-    :return: Form
-    """
-    return CursoPublicForm(**kwargs)
+    return CursoForm(**kwargs)
 
 
 def get_curso_cmd(curso_id):
@@ -64,6 +46,7 @@ def get_curso_cmd(curso_id):
     :return: Command
     """
     return NodeSearch(curso_id)
+
 
 
 def delete_curso_cmd(curso_id):

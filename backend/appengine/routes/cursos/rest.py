@@ -2,36 +2,37 @@
 from __future__ import absolute_import, unicode_literals
 from gaebusiness.business import CommandExecutionException
 from tekton.gae.middleware.json_middleware import JsonResponse
-from curso_app import facade
+from curso_app import curso_facade
 
 
 def index():
-    cmd = facade.list_cursos_cmd()
+    cmd = curso_facade.list_cursos_cmd()
     curso_list = cmd()
-    short_form=facade.curso_short_form()
-    curso_short = [short_form.fill_with_model(m) for m in curso_list]
-    return JsonResponse(curso_short)
+    curso_form=curso_facade.curso_form()
+    curso_dcts = [curso_form.fill_with_model(m) for m in curso_list]
+    return JsonResponse(curso_dcts)
 
 
-def save(**curso_properties):
-    cmd = facade.save_curso_cmd(**curso_properties)
-    return _save_or_update_json_response(cmd)
+def new(_resp, **curso_properties):
+    cmd = curso_facade.save_curso_cmd(**curso_properties)
+    return _save_or_update_json_response(cmd, _resp)
 
 
-def update(curso_id, **curso_properties):
-    cmd = facade.update_curso_cmd(curso_id, **curso_properties)
-    return _save_or_update_json_response(cmd)
+def edit(_resp, curso_id, **curso_properties):
+    cmd = curso_facade.update_curso_cmd(curso_id, **curso_properties)
+    return _save_or_update_json_response(cmd, _resp)
 
 
 def delete(curso_id):
-    facade.delete_curso_cmd(curso_id)()
+    curso_facade.delete_curso_cmd(curso_id)()
 
 
-def _save_or_update_json_response(cmd):
+def _save_or_update_json_response(cmd, _resp):
     try:
         curso = cmd()
     except CommandExecutionException:
+        _resp.status_code = 400
         return JsonResponse({'errors': cmd.errors})
-    short_form=facade.curso_short_form()
-    return JsonResponse(short_form.fill_with_model(curso))
+    curso_form=curso_facade.curso_form()
+    return JsonResponse(curso_form.fill_with_model(curso))
 

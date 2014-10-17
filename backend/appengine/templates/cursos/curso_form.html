@@ -1,4 +1,4 @@
-{% extends 'cursos/base.html' %}
+{% extends 'cursos/curso_base.html' %}
 {% block body %}
     {% set curso=curso or None %}
     {% set errors=errors or None %}
@@ -14,7 +14,6 @@
                         {{ csrf_input() }}
                         {{ form_input(_('Titulo'),'titulo',curso.titulo,errors.titulo) }}
                         {{ form_input(_('Preco'),'preco',curso.preco,errors.preco) }}
-                        {{ form_input(_('Inicio'),'inicio',curso.inicio,errors.inicio) }}
                         <button type="submit" class="btn btn-success">{% trans %}Save{% endtrans %}</button>
                     </form>
                 </div>

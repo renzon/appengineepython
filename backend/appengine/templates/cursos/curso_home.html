@@ -1,4 +1,4 @@
-{% extends 'cursos/base.html' %}
+{% extends 'cursos/curso_base.html' %}
 {% block body %}
     <div class="container">
         <div class="row">
@@ -15,7 +15,6 @@
                         <th>{% trans %}Creation{% endtrans %}</th>
                         <th>{% trans %}Titulo{% endtrans %}</th>
                         <th>{% trans %}Preco{% endtrans %}</th>
-                        <th>{% trans %}Inicio{% endtrans %}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -27,7 +26,6 @@
                             <td>{{ curso.creation }}</td>
                             <td>{{ curso.titulo }}</td>
                             <td>{{ curso.preco }}</td>
-                            <td>{{ curso.inicio }}</td>
                             <td>
                                 <form action="{{ curso.delete_path }}" method="post" onsubmit="return confirm('{{_('Are you sure to delete? Press cancel to avoid deletion.')}}');">
                                     {{ csrf_input() }}

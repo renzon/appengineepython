@@ -3,18 +3,32 @@ from __future__ import absolute_import, unicode_literals
 from config.template_middleware import TemplateResponse
 from tekton import router
 from gaecookie.decorator import no_csrf
-from gaepermission.decorator import login_not_required
-from curso_app import facade
-from routes.cursos import admin
+from curso_app import curso_facade
+from routes.cursos import new, edit
+from tekton.gae.middleware.redirect import RedirectResponse
 
 
-@login_not_required
 @no_csrf
 def index():
-    cmd = facade.list_cursos_cmd()
+    cmd = curso_facade.list_cursos_cmd()
     cursos = cmd()
-    public_form = facade.curso_public_form()
-    curso_public_dcts = [public_form.fill_with_model(curso) for curso in cursos]
-    context = {'cursos': curso_public_dcts,'admin_path':router.to_path(admin)}
-    return TemplateResponse(context)
+    edit_path = router.to_path(edit)
+    delete_path = router.to_path(delete)
+    curso_form = curso_facade.curso_form()
+
+    def localize_curso(curso):
+        curso_dct = curso_form.fill_with_model(curso)
+        curso_dct['edit_path'] = router.to_path(edit_path, curso_dct['id'])
+        curso_dct['delete_path'] = router.to_path(delete_path, curso_dct['id'])
+        return curso_dct
+
+    localized_cursos = [localize_curso(curso) for curso in cursos]
+    context = {'cursos': localized_cursos,
+               'new_path': router.to_path(new)}
+    return TemplateResponse(context, 'cursos/curso_home.html')
+
+
+def delete(curso_id):
+    curso_facade.delete_curso_cmd(curso_id)()
+    return RedirectResponse(router.to_path(index))
 
