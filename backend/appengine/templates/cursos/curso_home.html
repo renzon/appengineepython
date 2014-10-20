@@ -1,11 +1,47 @@
 {% extends 'cursos/curso_base.html' %}
+{% block js %}
+    <script type="text/javascript" src="/static/angular/js/angular.min.js"></script>
+    <script type="text/javascript">
+        function CursoController($scope) {
+            $scope.mostrarCursoFormFlag = false;
+
+            $scope.alterarVisibilidadeDeFormDeCurso = function () {
+                $scope.mostrarCursoFormFlag = !$scope.mostrarCursoFormFlag;
+            }
+        }
+    </script>
+{% endblock %}
 {% block body %}
-    <div class="container">
+    <div class="container" ng-app ng-controller="CursoController">
         <div class="row">
             <div class="col-md-12">
                 <h1>{% trans %}This is a generic home for curso_app {% endtrans %}  </h1>
-                <a href="{{ new_path }}" class="btn btn-success">{% trans %}Create New Curso{% endtrans %}</a>
-                <hr/>
+                <button class="btn btn-success" ng-click="alterarVisibilidadeDeFormDeCurso()">{% trans %}Create New Curso{% endtrans %}</button>
+            </div>
+        </div>
+        <div class="row" ng-show="mostrarCursoFormFlag">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="well">
+                    <h1 class="text-center">Formulário de Curso</h1>
+
+                    <form>
+                        <div class="form-group ">
+                            <label for="tituloInput" class="control-label">Titulo </label>
+                            <input id="tituloInput" type="text" class="form-control">
+                        </div>
+                        <div class="form-group ">
+                            <label for="precoInput" class="control-label">Preco </label>
+                            <input id="precoInput" type="text" class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-success">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <hr/>
+            <div class="col-md-12">
+
                 <h2>{% trans %}List of Cursos{% endtrans %}</h2>
                 <table class="table table-striped table-hover">
                     <thead>
@@ -27,7 +63,8 @@
                             <td>{{ curso.titulo }}</td>
                             <td>{{ curso.preco }}</td>
                             <td>
-                                <form action="{{ curso.delete_path }}" method="post" onsubmit="return confirm('{{_('Are you sure to delete? Press cancel to avoid deletion.')}}');">
+                                <form action="{{ curso.delete_path }}" method="post"
+                                      onsubmit="return confirm('{{ _('Are you sure to delete? Press cancel to avoid deletion.') }}');">
                                     {{ csrf_input() }}
                                     <button class="btn btn-danger btn-sm"><i
                                             class="glyphicon glyphicon-trash"></i></button>
