@@ -6,17 +6,21 @@ crud_modulo.directive('cursoform', function () {
         templateUrl: '/static/curso/html/curso_form.html',
         replace: true,
         scope: {},
-        controller: ['$scope','$http', function ($scope, $http) {
+        controller: ['$scope', '$http', function ($scope, $http) {
             $scope.curso = {titulo: "", preco: ""};
+            $scope.executandoSalvamento = false;
 
             $scope.salvar = function () {
-                var promessa = $http.post('/cursos/rest/new', $scope.curso);
-                promessa.success(function (curso_salvo) {
-                    console.log(curso_salvo);
-                    $scope.curso = {titulo: "", preco: ""};
-                });
+                if (!$scope.executandoSalvamento) {
+                    $scope.executandoSalvamento=true;
+                    var promessa = $http.post('/cursos/rest/new', $scope.curso);
+                    promessa.success(function (curso_salvo) {
+                        console.log(curso_salvo);
+                        $scope.curso = {titulo: "", preco: ""};
+                        $scope.executandoSalvamento=false;
+                    });
+                }
             }
-
         }]
     }
 });

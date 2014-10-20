@@ -7,5 +7,6 @@
         <label for="precoInput" class="control-label">Preco</label>
         <input id="precoInput" type="text" class="form-control" ng-model="curso.preco">
     </div>
-    <button type="submit" class="btn btn-success">Salvar</button>
+    <button type="submit" class="btn btn-success" ng-class="{disabled:executandoSalvamento}">Salvar</button>
+    <img src="/static/img/ajax.gif" ng-show="executandoSalvamento">
 </form>
