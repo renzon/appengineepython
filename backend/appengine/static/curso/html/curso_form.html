@@ -1,12 +1,16 @@
 <form ng-submit="salvar()">
-    <div class="form-group ">
-        <label for="tituloInput" class="control-label">Titulo</label>
-        <input id="tituloInput" type="text" class="form-control" ng-model="curso.titulo">
-    </div>
-    <div class="form-group ">
-        <label for="precoInput" class="control-label">Preco</label>
-        <input id="precoInput" type="text" class="form-control" ng-model="curso.preco">
-    </div>
+    <fieldset ng-disabled="executandoSalvamento">
+        <div class="form-group" ng-class="{true:'has-error',false:''}[erros.titulo!=null]">
+            <label for="tituloInput" class="control-label">Titulo</label>
+            <input id="tituloInput" type="text" class="form-control" ng-model="curso.titulo">
+            <span class="help-block">{{ erros.titulo }}</span>
+        </div>
+        <div class="form-group" ng-class="{true:'has-error',false:''}[erros.preco!=null]">
+            <label for="precoInput" class="control-label">Preco</label>
+            <input id="precoInput" type="text" class="form-control" ng-model="curso.preco">
+            <span class="help-block">{{ erros.preco }}</span>
+        </div>
+    </fieldset>
     <button type="submit" class="btn btn-success" ng-class="{disabled:executandoSalvamento}">Salvar</button>
     <img src="/static/img/ajax.gif" ng-show="executandoSalvamento">
 </form>

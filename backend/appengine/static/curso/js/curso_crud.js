@@ -9,14 +9,23 @@ crud_modulo.directive('cursoform', function () {
         controller: ['$scope', '$http', function ($scope, $http) {
             $scope.curso = {titulo: "", preco: ""};
             $scope.executandoSalvamento = false;
+            $scope.erros=[];
 
             $scope.salvar = function () {
                 if (!$scope.executandoSalvamento) {
                     $scope.executandoSalvamento=true;
+                    $scope.erros=[];
+
                     var promessa = $http.post('/cursos/rest/new', $scope.curso);
+
                     promessa.success(function (curso_salvo) {
                         console.log(curso_salvo);
                         $scope.curso = {titulo: "", preco: ""};
+                        $scope.executandoSalvamento=false;
+                    });
+
+                    promessa.error(function(erros){
+                        $scope.erros=erros;
                         $scope.executandoSalvamento=false;
                     });
                 }
