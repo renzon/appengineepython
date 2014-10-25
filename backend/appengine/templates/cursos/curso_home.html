@@ -3,6 +3,14 @@
     <script type="text/javascript" src="/static/angular/js/angular.min.js"></script>
     <script type="text/javascript" src="/static/curso/js/curso_crud.js"></script>
     <script type="text/javascript">
+        var curso_rest = angular.module('curso_rest', []);
+
+        curso_rest.factory('CursoAPI', ['$http', function ($http) {
+            return {salvar: function (curso) {
+                return $http.post('{{ salvar_path }}', curso);
+            }}
+        }]);
+
         function CursoController($scope) {
             $scope.mostrarCursoFormFlag = false;
 

@@ -4,7 +4,7 @@ from config.template_middleware import TemplateResponse
 from tekton import router
 from gaecookie.decorator import no_csrf
 from curso_app import curso_facade
-from routes.cursos import new, edit
+from routes.cursos import new, edit, rest
 from tekton.gae.middleware.redirect import RedirectResponse
 
 
@@ -24,7 +24,7 @@ def index():
 
     localized_cursos = [localize_curso(curso) for curso in cursos]
     context = {'cursos': localized_cursos,
-               'new_path': router.to_path(new)}
+               'salvar_path': router.to_path(rest.new)}
     return TemplateResponse(context, 'cursos/curso_home.html')
 
 
