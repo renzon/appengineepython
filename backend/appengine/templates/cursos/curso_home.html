@@ -12,6 +12,9 @@
                 },
                 listar: function () {
                     return $http.post('{{ listar_path }}');
+                },
+                editar: function (curso) {
+                    return $http.post('{{ editar_path }}', curso);
                 }
             };
         }]);
@@ -21,6 +24,10 @@
 {% endblock %}
 {% block body %}
     <div class="container" ng-app="curso_crud" ng-controller="CursoController">
+        <curso-edit-form id="editform"
+                         curso="cursoParaEdicao"
+                         curso-editado-handler="esconderFormEdicao()">
+        </curso-edit-form>
         <div class="row">
             <div class="col-md-12">
                 <h1>{% trans %}This is a generic home for curso_app {% endtrans %}  </h1>
@@ -52,7 +59,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr cursolinha ng-repeat="curso in cursos" curso="curso" ></tr>
+                    <tr cursolinha ng-repeat="curso in cursos"
+                        curso="curso"
+                        editar-curso="editarCurso(curso)"></tr>
                     </tbody>
                 </table>
             </div>

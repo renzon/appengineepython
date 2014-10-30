@@ -25,6 +25,7 @@ def index():
     localized_cursos = [localize_curso(curso) for curso in cursos]
     context = {'cursos': localized_cursos,
                'salvar_path': router.to_path(rest.new),
+               'editar_path': router.to_path(rest.edit),
                'listar_path': router.to_path(rest.index)}
     return TemplateResponse(context, 'cursos/curso_home.html')
 
