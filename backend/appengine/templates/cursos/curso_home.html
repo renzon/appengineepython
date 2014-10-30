@@ -6,18 +6,17 @@
         var curso_rest = angular.module('curso_rest', []);
 
         curso_rest.factory('CursoAPI', ['$http', function ($http) {
-            return {salvar: function (curso) {
-                return $http.post('{{ salvar_path }}', curso);
-            }}
+            return {
+                salvar: function (curso) {
+                    return $http.post('{{ salvar_path }}', curso);
+                },
+                listar: function () {
+                    return $http.post('{{ listar_path }}');
+                }
+            };
         }]);
 
-        function CursoController($scope) {
-            $scope.mostrarCursoFormFlag = false;
 
-            $scope.alterarVisibilidadeDeFormDeCurso = function () {
-                $scope.mostrarCursoFormFlag = !$scope.mostrarCursoFormFlag;
-            }
-        }
     </script>
 {% endblock %}
 {% block body %}
@@ -33,7 +32,7 @@
             <div class="col-md-6 col-md-offset-3">
                 <div class="well">
                     <h1 class="text-center">Formulário de Curso</h1>
-                    <cursoform></cursoform>
+                    <cursoform curso-salvo-handler="adicionarCurso(curso)"></cursoform>
                 </div>
             </div>
         </div>
@@ -46,31 +45,14 @@
                     <thead>
                     <tr>
                         <th/>
-                        <th>{% trans %}Id{% endtrans %}</th>
-                        <th>{% trans %}Creation{% endtrans %}</th>
                         <th>{% trans %}Titulo{% endtrans %}</th>
                         <th>{% trans %}Preco{% endtrans %}</th>
+                        <th>{% trans %}Id{% endtrans %}</th>
+                        <th>{% trans %}Creation{% endtrans %}</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for curso in cursos %}
-                        <tr>
-                            <td><a href="{{ curso.edit_path }}" class="btn btn-success btn-sm"><i
-                                    class="glyphicon glyphicon-pencil"></i></a></td>
-                            <td>{{ curso.id }}</td>
-                            <td>{{ curso.creation }}</td>
-                            <td>{{ curso.titulo }}</td>
-                            <td>{{ curso.preco }}</td>
-                            <td>
-                                <form action="{{ curso.delete_path }}" method="post"
-                                      onsubmit="return confirm('{{ _('Are you sure to delete? Press cancel to avoid deletion.') }}');">
-                                    {{ csrf_input() }}
-                                    <button class="btn btn-danger btn-sm"><i
-                                            class="glyphicon glyphicon-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                        <tr cursolinha ng-repeat="curso in cursos" curso="curso" ></tr>
                     </tbody>
                 </table>
             </div>
