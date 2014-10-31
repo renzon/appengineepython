@@ -1,6 +1,8 @@
 <tr>
     <td>
-        <button class="btn btn-success btn-sm" ng-click="iniciarEdicao()">
+        <button class="btn btn-success btn-sm"
+                ng-click="iniciarEdicao()"
+                ng-hide="apagandoCursoFlag">
             <i class="glyphicon glyphicon-pencil"></i>
         </button>
     </td>
@@ -9,8 +11,11 @@
     <td>{{ curso.id }}</td>
     <td>{{ curso.creation }}</td>
     <td>
-        <button class="btn btn-danger btn-sm">
+        <button class="btn btn-danger btn-sm"
+                ng-click="apagar()"
+                ng-hide="apagandoCursoFlag">
             <i class="glyphicon glyphicon-trash"></i>
         </button>
+        <img src="/static/img/ajax.gif" ng-show="apagandoCursoFlag">
     </td>
 </tr>

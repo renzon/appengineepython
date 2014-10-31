@@ -31,8 +31,9 @@ crud_modulo.controller('CursoController', ['$scope', 'CursoAPI', function ($scop
         $scope.mostrarCursoFormFlag = !$scope.mostrarCursoFormFlag;
     };
 
-
-
+    $scope.removerCurso = function ($index) {
+        $scope.cursos.splice($index, 1);
+    }
 
 }]);
 
@@ -121,11 +122,24 @@ crud_modulo.directive('cursolinha', function () {
         templateUrl: '/static/curso/html/curso_linha.html',
         scope: {
             curso: '=',
-            editarCurso: '&'
+            editarCurso: '&',
+            apagarCursoHandler: '&'
         },
-        controller: ['$scope', function ($scope) {
+        controller: ['$scope', 'CursoAPI', function ($scope, CursoAPI) {
+            $scope.apagandoCursoFlag=false;
+
             $scope.iniciarEdicao = function () {
                 $scope.editarCurso({'curso': $scope.curso});
+            };
+
+            $scope.apagar = function () {
+                $scope.apagandoCursoFlag=true;
+                CursoAPI.apagar($scope.curso.id).success(function () {
+                    $scope.apagarCursoHandler();
+                }).error(function () {
+                    $scope.apagandoCursoFlag=false;
+                    alert('Desculpe, não foi possível apagar');
+                })
             };
         }]
     }

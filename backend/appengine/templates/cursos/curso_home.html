@@ -15,6 +15,9 @@
                 },
                 editar: function (curso) {
                     return $http.post('{{ editar_path }}', curso);
+                },
+                apagar: function (id) {
+                    return $http.post('{{ apagar_path }}', {'id':id});
                 }
             };
         }]);
@@ -56,11 +59,13 @@
                         <th>{% trans %}Preco{% endtrans %}</th>
                         <th>{% trans %}Id{% endtrans %}</th>
                         <th>{% trans %}Creation{% endtrans %}</th>
+                        <th/>
                     </tr>
                     </thead>
                     <tbody>
                     <tr cursolinha ng-repeat="curso in cursos"
                         curso="curso"
+                        apagar-curso-handler="removerCurso($index)"
                         editar-curso="editarCurso(curso)"></tr>
                     </tbody>
                 </table>
