@@ -40,11 +40,15 @@ handlers:
   static_files: static\1
   upload: static.*
 
+- url: /.*tasks.*
+  script: convention.app
+  secure: always
+  login: admin
+
 - url: /[^_].*
   script: convention.app
   secure: always
 
 - url: /_ah/warmup
   script: routes.warmup.app
-
 

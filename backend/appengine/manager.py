@@ -15,15 +15,190 @@ if 'GAE_SDK' in os.environ:
     dev_appserver.fix_sys_path()
 else:
     print "GAE_SDK environment variable must be on path and point to App Engine's SDK folder"
+from gaeforms.ndb.property import SimpleCurrency, SimpleDecimal
+from google.appengine.ext.ndb.model import StringProperty, TextProperty, DateProperty, DateTimeProperty, \
+    IntegerProperty, \
+    FloatProperty, BooleanProperty
 
 PROJECT_DIR = os.path.dirname(__file__)
 PROJECT_DIR = os.path.abspath(os.path.join(PROJECT_DIR, '..'))
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')
+TEST_DIR = os.path.join(PROJECT_DIR, 'test')
 sys.path.insert(1, APPS_DIR)
 APPENGINE_DIR = os.path.join(PROJECT_DIR, 'appengine')
 WEB_DIR = os.path.join(APPENGINE_DIR, 'routes')
 TEMPLATES_DIR = os.path.join(APPENGINE_DIR, 'templates')
 # Templates
+
+REST_TESTS_TEMPLATE = '''# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+from datetime import datetime, date
+from decimal import Decimal
+from base import GAETestCase
+from %(app)s_app.%(app)s_model import %(model)s
+from routes.%(app)ss import rest
+from mock import Mock
+from mommygae import mommy
+
+
+class IndexTests(GAETestCase):
+    def test_success(self):
+        mommy.save_one(%(model)s)
+        mommy.save_one(%(model)s)
+        json_response = rest.index()
+        context = json_response.context
+        self.assertEqual(2, len(context))
+        %(model_underscore)s_dct = context[0]
+        self.assertSetEqual(set(['id', 'creation', %(model_properties)s]), set(%(model_underscore)s_dct.iterkeys()))
+        self.assert_can_serialize_as_json(json_response)
+
+
+class NewTests(GAETestCase):
+    def test_success(self):
+        self.assertIsNone(%(model)s.query().get())
+        json_response = rest.new(None, c='1.01', b='True', d='1.03', f='1.4', i='5', k='k_string',
+                                 time='1/1/2014 01:7:0', date='1/8/2014')
+        db_%(model_underscore)s = %(model)s.query().get()
+        self.assertIsNotNone(db_%(model_underscore)s)
+%(model_assertions)s
+        self.assert_can_serialize_as_json(json_response)
+
+    def test_error(self):
+        resp = Mock()
+        json_response = rest.new(resp)
+        errors = json_response.context
+        self.assertEqual(500, resp.status_code)
+        self.assertSetEqual(set([%(model_properties)s]), set(errors.keys()))
+        self.assert_can_serialize_as_json(json_response)
+
+
+class EditTests(GAETestCase):
+    def test_success(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        old_properties = %(model_underscore)s.to_dict()
+        json_response = rest.edit(None, %(model_underscore)s.key.id(), c='1.01', b='True', d='1.03', f='1.4', i='5', k='k_string',
+                                  time='1/1/2014 01:7:0',
+                                  date='1/8/2014')
+        db_%(model_underscore)s = %(model_underscore)s.key.get()
+%(model_assertions)s
+        self.assertNotEqual(old_properties, db_%(model_underscore)s.to_dict())
+        self.assert_can_serialize_as_json(json_response)
+
+    def test_error(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        old_properties = %(model_underscore)s.to_dict()
+        resp = Mock()
+        json_response = rest.edit(resp, %(model_underscore)s.key.id())
+        errors = json_response.context
+        self.assertEqual(500, resp.status_code)
+        self.assertSetEqual(set([%(model_properties)s]), set(errors.keys()))
+        self.assertEqual(old_properties, %(model_underscore)s.key.get().to_dict())
+        self.assert_can_serialize_as_json(json_response)
+
+
+class DeleteTests(GAETestCase):
+    def test_success(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        rest.delete(%(model_underscore)s.key.id())
+        self.assertIsNone(%(model_underscore)s.key.get())
+'''
+
+HOME_TESTS_TEMPLATE = '''# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+from base import GAETestCase
+from %(app)s_app.%(app)s_model import %(model)s
+from routes.%(app)ss.home import index, delete
+from mommygae import mommy
+from tekton.gae.middleware.redirect import RedirectResponse
+
+
+class IndexTests(GAETestCase):
+    def test_success(self):
+        mommy.save_one(%(model)s)
+        template_response = index()
+        self.assert_can_render(template_response)
+
+
+class DeleteTests(GAETestCase):
+    def test_success(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        redirect_response = delete(%(model_underscore)s.key.id())
+        self.assertIsInstance(redirect_response, RedirectResponse)
+        self.assertIsNone(%(model_underscore)s.key.get())
+
+'''
+
+EDIT_TESTS_TEMPLATE = '''# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+from base import GAETestCase
+from datetime import datetime, date
+from decimal import Decimal
+from %(app)s_app.%(app)s_model import %(model)s
+from routes.%(app)ss.edit import index, save
+from mommygae import mommy
+from tekton.gae.middleware.redirect import RedirectResponse
+
+
+class IndexTests(GAETestCase):
+    def test_success(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        template_response = index(%(model_underscore)s.key.id())
+        self.assert_can_render(template_response)
+
+
+class EditTests(GAETestCase):
+    def test_success(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        old_properties = %(model_underscore)s.to_dict()
+        redirect_response = save(%(model_underscore)s.key.id(), c='1.01', b='True', d='1.03', f='1.4', i='5', k='k_string',
+                                 time='1/1/2014 01:7:0',
+                                 date='1/8/2014')
+        self.assertIsInstance(redirect_response, RedirectResponse)
+        edited_%(model_underscore)s = %(model_underscore)s.key.get()
+%(model_assertions)s
+        self.assertNotEqual(old_properties, edited_%(model_underscore)s.to_dict())
+
+    def test_error(self):
+        %(model_underscore)s = mommy.save_one(%(model)s)
+        old_properties = %(model_underscore)s.to_dict()
+        template_response = save(%(model_underscore)s.key.id())
+        errors = template_response.context['errors']
+        self.assertSetEqual(set([%(model_properties)s]), set(errors.keys()))
+        self.assertEqual(old_properties, %(model_underscore)s.key.get().to_dict())
+        self.assert_can_render(template_response)
+'''
+
+NEW_TESTS_TEMPLATE = '''# -*- coding: utf-8 -*-
+from __future__ import absolute_import, unicode_literals
+from base import GAETestCase
+from datetime import datetime, date
+from decimal import Decimal
+from %(app)s_app.%(app)s_model import %(model)s
+from routes.%(app)ss.new import index, save
+from tekton.gae.middleware.redirect import RedirectResponse
+
+
+class IndexTests(GAETestCase):
+    def test_success(self):
+        template_response = index()
+        self.assert_can_render(template_response)
+
+
+class SaveTests(GAETestCase):
+    def test_success(self):
+        self.assertIsNone(%(model)s.query().get())
+        redirect_response = save(%(request_values)s)
+        self.assertIsInstance(redirect_response, RedirectResponse)
+        saved_%(model_underscore)s = %(model)s.query().get()
+        self.assertIsNotNone(saved_%(model_underscore)s)
+%(model_assertions)s
+
+    def test_error(self):
+        template_response = save()
+        errors = template_response.context['errors']
+        self.assertSetEqual(set([%(model_properties)s]), set(errors.keys()))
+        self.assert_can_render(template_response)
+'''
 
 MODEL_TEMPLATE = '''# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
@@ -243,7 +418,7 @@ from %(app_name)s import %(app)s_facade
 def index():
     cmd = %(app)s_facade.list_%(model_underscore)ss_cmd()
     %(model_underscore)s_list = cmd()
-    %(model_underscore)s_form=%(app)s_facade.%(model_underscore)s_form()
+    %(model_underscore)s_form = %(app)s_facade.%(model_underscore)s_form()
     %(model_underscore)s_dcts = [%(model_underscore)s_form.fill_with_model(m) for m in %(model_underscore)s_list]
     return JsonResponse(%(model_underscore)s_dcts)
 
@@ -253,22 +428,22 @@ def new(_resp, **%(model_underscore)s_properties):
     return _save_or_update_json_response(cmd, _resp)
 
 
-def edit(_resp, %(model_underscore)s_id, **%(model_underscore)s_properties):
-    cmd = %(app)s_facade.update_%(model_underscore)s_cmd(%(model_underscore)s_id, **%(model_underscore)s_properties)
+def edit(_resp, id, **%(model_underscore)s_properties):
+    cmd = %(app)s_facade.update_%(model_underscore)s_cmd(id, **%(model_underscore)s_properties)
     return _save_or_update_json_response(cmd, _resp)
 
 
-def delete(%(model_underscore)s_id):
-    %(app)s_facade.delete_%(model_underscore)s_cmd(%(model_underscore)s_id)()
+def delete(id):
+    %(app)s_facade.delete_%(model_underscore)s_cmd(id)()
 
 
 def _save_or_update_json_response(cmd, _resp):
     try:
         %(model_underscore)s = cmd()
     except CommandExecutionException:
-        _resp.status_code = 400
-        return JsonResponse({'errors': cmd.errors})
-    %(model_underscore)s_form=%(app)s_facade.%(model_underscore)s_form()
+        _resp.status_code = 500
+        return JsonResponse(cmd.errors)
+    %(model_underscore)s_form = %(app)s_facade.%(model_underscore)s_form()
     return JsonResponse(%(model_underscore)s_form.fill_with_model(%(model_underscore)s))
 
 '''
@@ -357,14 +532,14 @@ def _create_package(package_path):
 
 
 def _create_app(name, app_path, model, *properties):
-    properties = '\n'.join(parse_propety(p) for p in properties)
+    properties = '\n'.join(parse_property(p) for p in properties)
     properties = properties or '    pass'
     _create_package(app_path)
     _create_file_if_not_existing(os.path.join(app_path, '%s_model.py' % name),
                                  MODEL_TEMPLATE % {'model': model, 'properties': properties})
 
 
-def parse_propety(p):
+def parse_property(p):
     name, type_alias = p.split(':')
     types = {'string': 'ndb.StringProperty(required=True)',
              'date': 'ndb.DateProperty(required=True)',
@@ -390,10 +565,15 @@ def _build_properties(model, properties):
     return ', \n                '.join([PROPERTY % {'model': model, 'property': p} for p in properties])
 
 
-def _model_properties(app, model):
+def _model_class(app, model):
     app_path = app + '_app'
     model_module = importlib.import_module(app_path + '.%s_model' % app)
     model_class = getattr(model_module, model)
+    return model_class
+
+
+def _model_properties(app, model):
+    model_class = _model_class(app, model)
     properties = set(model_class._properties.keys())
     properties = properties.difference(set(['class']))
     return properties
@@ -416,132 +596,116 @@ def _title(param):
     print ('- ' * n) + param + (' -' * n)
 
 
-def init_commands(app, model):
-    print APPS_DIR
-    app_path = os.path.join(APPS_DIR, app + '_app')
-    commands_script = os.path.join(app_path, '%s_commands.py' % app)
-    content = commands_code_for(app, model)
-    _create_file_if_not_existing(commands_script, content)
-    return content
-
-
 def _to_app_name(app):
     return app + '_app'
 
 
-def _to_undescore_case(model):
+def _to_underscore_case(model):
     model_underscore = model[0].lower() + model[1:]
     return ''.join(('_' + letter.lower() if letter.isupper() else letter) for letter in model_underscore)
 
 
-def facade_code_for(app, model):
-    app_path = _to_app_name(app)
-    model_underscore = _to_undescore_case(model)
-
-    dct = {'app': app, 'app_path': app_path, 'model': model, 'model_underscore': model_underscore}
-    return FACADE_TEMPLATE % dct
+def generate_generic(app, model, template_path_function, file_name, content_function):
+    app_template_path = template_path_function(app)
+    template_file = os.path.join(app_template_path, file_name)
+    content = content_function(app, model)
+    _create_file_if_not_existing(template_file, content)
+    return content
 
 
 def _to_app_path(app):
     return os.path.join(APPS_DIR, app + '_app')
 
 
+def generate_app_file(app, model, file_name, content_function):
+    file_name = '%s_%s.py' % (app, file_name)
+    return generate_generic(app, model, _to_app_path, file_name, content_function)
+
+
+def init_commands(app, model):
+    return generate_app_file(app, model, 'commands', commands_code_for)
+
+
+def facade_code_for(app, model):
+    app_path = _to_app_name(app)
+    model_underscore = _to_underscore_case(model)
+
+    dct = {'app': app, 'app_path': app_path, 'model': model, 'model_underscore': model_underscore}
+    return FACADE_TEMPLATE % dct
+
+
 def init_facade(app, model):
-    app_path = _to_app_path(app)
-    facade_script = os.path.join(app_path, '%s_facade.py' % app)
-    content = facade_code_for(app, model)
-    _create_file_if_not_existing(facade_script, content)
-    return content
+    return generate_app_file(app, model, 'facade', facade_code_for)
 
 
-def _to_web_name(app):
+def _to_routes_name(app):
     return app + 's'
 
 
-def _to_web_path(app):
-    return os.path.join(WEB_DIR, _to_web_name(app))
-
-
-def _to_template_path(app):
-    return os.path.join(TEMPLATES_DIR, _to_web_name(app))
-
-
-def init_web(app):
-    web_path = _to_web_path(app)
+def init_routes(app):
+    web_path = _to_routes_path(app)
     _create_package(web_path)
 
 
-def init_web_admin(app):
-    web_path = _to_web_path(app)
-    _create_package(web_path)
+def _to_routes_path(app):
+    return os.path.join(WEB_DIR, _to_routes_name(app))
+
+
+def generate_routes(app, model, file_name, content_function):
+    file_name = '%s.py' % file_name
+    return generate_generic(app, model, _to_routes_path, file_name, content_function)
 
 
 def code_for_home_script(app, model):
-    web_name = _to_web_name(app)
+    web_name = _to_routes_name(app)
     app_name = _to_app_name(app)
     return HOME_SCRIPT_TEMPLATE % {'app_name': app_name,
-                                   'model_underscore': _to_undescore_case(model),
+                                   'model_underscore': _to_underscore_case(model),
                                    'web_name': web_name,
                                    'app': app}
 
 
 def init_home_script(app, model):
-    app_web_path = _to_web_path(app)
-    home_script = os.path.join(app_web_path, 'home.py')
-    content = code_for_home_script(app, model)
-    _create_file_if_not_existing(home_script, content)
-    return content
+    return generate_routes(app, model, 'home', code_for_home_script)
 
 
-def code_for_form_script(app, model):
-    web_name = _to_web_name(app)
+def code_for_new_script(app, model):
+    web_name = _to_routes_name(app)
     app_name = _to_app_name(app)
     return NEW_SCRIPT_TEMPLATE % {'app_name': app_name,
-                                  'model_underscore': _to_undescore_case(model),
+                                  'model_underscore': _to_underscore_case(model),
                                   'web_name': web_name,
                                   'app': app}
 
 
+def init_new_script(app, model):
+    return generate_routes(app, model, 'new', code_for_new_script)
+
+
 def code_for_edit_script(app, model):
-    web_name = _to_web_name(app)
+    web_name = _to_routes_name(app)
     app_name = _to_app_name(app)
     return EDIT_SCRIPT_TEMPLATE % {'app_name': app_name,
-                                   'model_underscore': _to_undescore_case(model),
+                                   'model_underscore': _to_underscore_case(model),
                                    'web_name': web_name,
                                    'app': app}
 
 
-def init_new_script(app, model):
-    app_web_path = _to_web_path(app)
-    form_script = os.path.join(app_web_path, 'new.py')
-    content = code_for_form_script(app, model)
-    _create_file_if_not_existing(form_script, content)
-    return content
-
-
 def init_edit_script(app, model):
-    app_web_path = _to_web_path(app)
-    form_script = os.path.join(app_web_path, 'edit.py')
-    content = code_for_edit_script(app, model)
-    _create_file_if_not_existing(form_script, content)
-    return content
+    return generate_routes(app, model, 'edit', code_for_edit_script)
 
 
 def code_for_rest_script(app, model):
-    web_name = _to_web_name(app)
+    web_name = _to_routes_name(app)
     app_name = _to_app_name(app)
     return REST_SCRIPT_TEMPLATE % {'app_name': app_name,
-                                   'model_underscore': _to_undescore_case(model),
+                                   'model_underscore': _to_underscore_case(model),
                                    'web_name': web_name,
                                    'app': app}
 
 
 def init_rest_script(app, model):
-    app_web_path = _to_web_path(app)
-    rest_script = os.path.join(app_web_path, 'rest.py')
-    content = code_for_rest_script(app, model)
-    _create_file_if_not_existing(rest_script, content)
-    return content
+    return generate_routes(app, model, 'rest', code_for_rest_script)
 
 
 APP_BASE_HTML_TEMPLATE = '''{%% extends 'base/base.html' %%}
@@ -550,9 +714,13 @@ APP_BASE_HTML_TEMPLATE = '''{%% extends 'base/base.html' %%}
 {%% endblock %%}'''
 
 
+def _to_template_path(app):
+    return os.path.join(TEMPLATES_DIR, _to_routes_name(app))
+
+
 def init_html_templates(app):
     template_path = _to_template_path(app)
-    content = APP_BASE_HTML_TEMPLATE % {'app_name_upper': _to_web_name(app).upper()}
+    content = APP_BASE_HTML_TEMPLATE % {'app_name_upper': _to_routes_name(app).upper()}
     _create_dir_if_not_existing(template_path)
     base_dir = os.path.join(template_path, '%s_base.html' % app)
     _create_file_if_not_existing(base_dir, content)
@@ -571,65 +739,188 @@ def _to_html_table_header(properties):
     return '\n'.join(rendered)
 
 
-def _to_html_table_columns(model_undescore, properties):
+def _to_html_table_columns(model_underscore, properties):
     template = ' ' * 28 + '<td>{{ %(model_underscore)s.%(property)s }}</td>'
 
-    rendered = [template % {'model_underscore': model_undescore, 'property': p} for p in properties]
+    rendered = [template % {'model_underscore': model_underscore, 'property': p} for p in properties]
     return '\n'.join(rendered)
 
 
-def _to_html_form_inputs(model_undescore, properties):
+def _to_html_form_inputs(model_underscore, properties):
     template = "{{ form_input(_('%(label)s'),'%(property)s',%(model_underscore)s.%(property)s,errors.%(property)s) }}"
     template = ' ' * 24 + template
 
-    rendered = [template % {'model_underscore': model_undescore, 'property': p, 'label': _to_label(p)} for p in
+    rendered = [template % {'model_underscore': model_underscore, 'property': p, 'label': _to_label(p)} for p in
                 properties]
     return '\n'.join(rendered)
 
 
+def generate_template(app, model, file_name, content_function):
+    file_name = '%s_%s.html' % (app, file_name)
+    return generate_generic(app, model, _to_template_path, file_name, content_function)
+
+
 def code_for_home_html(app, model):
-    web_name = _to_web_name(app)
+    web_name = _to_routes_name(app)
     app_name = _to_app_name(app)
     properties = _model_properties(app, model)
     properties = properties.difference(set(['creation']))
-    model_undescore = _to_undescore_case(model)
+    model_underscore = _to_underscore_case(model)
     return HOME_HTML_TEMPLATE % {'app_name': app_name,
-                                 'model_underscore': model_undescore,
+                                 'model_underscore': model_underscore,
                                  'model': model,
                                  'web_name': web_name,
                                  'headers': _to_html_table_header(properties),
-                                 'columns': _to_html_table_columns(model_undescore, properties),
-                                 'app': app}
-
-
-def code_for_form_html(app, model):
-    web_name = _to_web_name(app)
-    app_name = _to_app_name(app)
-    properties = _model_properties(app, model)
-    properties = properties.difference(set(['creation']))
-    model_undescore = _to_undescore_case(model)
-    return FORM_HTML_TEMPLATE % {'app_name': app_name,
-                                 'model_underscore': model_undescore,
-                                 'model': model,
-                                 'web_name': web_name,
-                                 'inputs': _to_html_form_inputs(model_undescore, properties),
+                                 'columns': _to_html_table_columns(model_underscore, properties),
                                  'app': app}
 
 
 def init_home_html(app, model):
-    app_template_path = _to_template_path(app)
-    home_script = os.path.join(app_template_path, '%s_home.html' % app)
-    content = code_for_home_html(app, model)
-    _create_file_if_not_existing(home_script, content)
-    return content
+    return generate_template(app, model, 'home', code_for_home_html)
+
+
+def code_for_form_html(app, model):
+    web_name = _to_routes_name(app)
+    app_name = _to_app_name(app)
+    properties = _model_properties(app, model)
+    properties = properties.difference(set(['creation']))
+    model_underscore = _to_underscore_case(model)
+    return FORM_HTML_TEMPLATE % {'app_name': app_name,
+                                 'model_underscore': model_underscore,
+                                 'model': model,
+                                 'web_name': web_name,
+                                 'inputs': _to_html_form_inputs(model_underscore, properties),
+                                 'app': app}
 
 
 def init_form_html(app, model):
-    app_template_path = _to_template_path(app)
-    form_script = os.path.join(app_template_path, '%s_form.html' % app)
-    content = code_for_form_html(app, model)
-    _create_file_if_not_existing(form_script, content)
-    return content
+    return generate_template(app, model, 'form', code_for_form_html)
+
+
+def init_test(name, model, *properties):
+    _title('Creating test package')
+    test_path = os.path.join(TEST_DIR, name + '_tests')
+    _create_package(test_path)
+
+
+def _to_test_path(app):
+    return os.path.join(TEST_DIR, app + '_tests')
+
+
+def generate_tests(app, model, file_name, content_function):
+    file_name = '%s_%s_tests.py' % (app, file_name)
+    return generate_generic(app, model, _to_test_path, file_name, content_function)
+
+
+def _to_default_model_value(descriptor, name, index):
+    if isinstance(descriptor, (StringProperty, TextProperty)):
+        return "'%s_string'" % name
+    if isinstance(descriptor, DateProperty):
+        return "date(2014, 1, %s)" % (index + 1)
+    if isinstance(descriptor, DateTimeProperty):
+        return "datetime(2014, 1, 1, 1, %s, 0)" % (index + 1)
+    if isinstance(descriptor, (SimpleCurrency, SimpleDecimal)):
+        return "Decimal('1.%s')" % (index + 1 if index >= 9 else '0%s' % (index + 1))
+    if isinstance(descriptor, IntegerProperty):
+        return "%s" % (index + 1)
+    if isinstance(descriptor, FloatProperty):
+        return "1.%s" % (index + 1)
+    if isinstance(descriptor, BooleanProperty):
+        return "True"
+
+
+def _to_model_assertions(variable, descriptors_dct):
+    template = "        self.assertEquals(%(value)s, %(variable)s.%(property)s)"
+    rendered = [template % {'variable': variable, 'property': p, 'value': _to_default_model_value(descriptor, p, i)} for
+                i, (p, descriptor) in
+                enumerate(descriptors_dct.iteritems())]
+    return '\n'.join(rendered)
+
+
+def _to_default_reques_value(descriptor, name, index):
+    if isinstance(descriptor, (StringProperty, TextProperty)):
+        return "'%s_string'" % name
+    if isinstance(descriptor, DateProperty):
+        return "'1/%s/2014'" % (index + 1)
+    if isinstance(descriptor, DateTimeProperty):
+        return "'1/1/2014 01:%s:0'" % (index + 1)
+    if isinstance(descriptor, (SimpleCurrency, SimpleDecimal)):
+        return "'1.%s'" % (index + 1 if index >= 9 else '0%s' % (index + 1))
+    if isinstance(descriptor, IntegerProperty):
+        return "'%s'" % (index + 1)
+    if isinstance(descriptor, FloatProperty):
+        return "'1.%s'" % (index + 1)
+    if isinstance(descriptor, BooleanProperty):
+        return "'True'"
+
+
+def _to_request_values(variable, descriptors_dct):
+    template = "%(property)s=%(value)s"
+    rendered = [template % {'variable': variable, 'property': p, 'value': _to_default_reques_value(descriptor, p, i)}
+                for
+                i, (p, descriptor) in
+                enumerate(descriptors_dct.iteritems())]
+    return ', '.join(rendered)
+
+
+def _model_descriptors(app, model):
+    model_class = _model_class(app, model)
+    return {k: p for k, p in model_class._properties.iteritems() if k not in ['class', 'creation']}
+
+
+def code_new_tests(app, model):
+    descriptors_dct = _model_descriptors(app, model)
+    model_underscore = _to_underscore_case(model)
+    model_assertions = _to_model_assertions('saved_' + model_underscore, descriptors_dct)
+    model_properties = ', '.join("'%s'" % k for k in descriptors_dct)
+    request_values = _to_request_values('saved_' + model_underscore, descriptors_dct)
+    return NEW_TESTS_TEMPLATE % {'app': app, 'model': model, 'model_underscore': model_underscore,
+                                 'model_assertions': model_assertions, 'request_values': request_values,
+                                 'model_properties': model_properties}
+
+
+def code_edit_tests(app, model):
+    descriptors_dct = _model_descriptors(app, model)
+    model_underscore = _to_underscore_case(model)
+    model_assertions = _to_model_assertions('edited_' + model_underscore, descriptors_dct)
+    model_properties = ', '.join("'%s'" % k for k in descriptors_dct)
+    request_values = _to_request_values('edited_' + model_underscore, descriptors_dct)
+    return EDIT_TESTS_TEMPLATE % {'app': app, 'model': model, 'model_underscore': model_underscore,
+                                  'model_assertions': model_assertions, 'request_values': request_values,
+                                  'model_properties': model_properties}
+
+
+def code_home_tests(app, model):
+    model_underscore = _to_underscore_case(model)
+    return HOME_TESTS_TEMPLATE % {'app': app, 'model': model, 'model_underscore': model_underscore}
+
+
+def code_rest_tests(app, model):
+    descriptors_dct = _model_descriptors(app, model)
+    model_underscore = _to_underscore_case(model)
+    model_assertions = _to_model_assertions('db_' + model_underscore, descriptors_dct)
+    model_properties = ', '.join("'%s'" % k for k in descriptors_dct)
+    request_values = _to_request_values('db_' + model_underscore, descriptors_dct)
+    return REST_TESTS_TEMPLATE % {'app': app, 'model': model, 'model_underscore': model_underscore,
+                                  'model_assertions': model_assertions, 'db_values': request_values,
+                                  'model_properties': model_properties}
+
+
+
+def init_new_tests(app, model):
+    return generate_tests(app, model, 'new', code_new_tests)
+
+
+def init_edit_tests(app, model):
+    return generate_tests(app, model, 'edit', code_edit_tests)
+
+
+def init_home_tests(app, model):
+    return generate_tests(app, model, 'home', code_home_tests)
+
+
+def init_rest_tests(app, model):
+    return generate_tests(app, model, 'rest', code_rest_tests)
 
 
 def scaffold(app, model, *properties):
@@ -640,7 +931,7 @@ def scaffold(app, model, *properties):
     print init_facade(app, model)
 
     _title('creating routes folder')
-    init_web(app)
+    init_routes(app)
     _title('routes home.py')
     print init_home_script(app, model)
 
@@ -658,6 +949,16 @@ def scaffold(app, model, *properties):
     _title('templates/form.html')
     print init_form_html(app, model)
 
+    init_test(app, model)
+    _title('creating new tests')
+    print init_new_tests(app, model)
+    _title('creating edit tests')
+    print init_edit_tests(app, model)
+    _title('creating home tests')
+    print init_home_tests(app, model)
+    _title('creating rest tests')
+    print init_rest_tests(app, model)
+
 
 def delete_app(app):
     flag = raw_input('Are you sure you want delete app %s (yes or no)? ' % app)
@@ -667,8 +968,12 @@ def delete_app(app):
 
         template_dir = os.path.join(TEMPLATES_DIR, app + 's')
         shutil.rmtree(template_dir)
+
         web_dir = os.path.join(WEB_DIR, app + 's')
         shutil.rmtree(web_dir)
+
+        test_dir = os.path.join(TEST_DIR, app + '_tests')
+        shutil.rmtree(test_dir)
 
 
 FUNC_DICT = {'model': init_app, 'app': scaffold, 'delete': delete_app}
