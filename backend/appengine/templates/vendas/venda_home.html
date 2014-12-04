@@ -1,0 +1,41 @@
+{% extends 'vendas/venda_base.html' %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{% trans %}This is a generic home for venda_app {% endtrans %}  </h1>
+                <a href="{{ new_path }}" class="btn btn-success">{% trans %}Create New Venda{% endtrans %}</a>
+                <hr/>
+                <h2>{% trans %}List of Vendas{% endtrans %}</h2>
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th/>
+                        <th>{% trans %}Id{% endtrans %}</th>
+                        <th>{% trans %}Creation{% endtrans %}</th>
+                        <th>{% trans %}Preco{% endtrans %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for venda in vendas %}
+                        <tr>
+                            <td><a href="{{ venda.edit_path }}" class="btn btn-success btn-sm"><i
+                                    class="glyphicon glyphicon-pencil"></i></a></td>
+                            <td>{{ venda.id }}</td>
+                            <td>{{ venda.creation }}</td>
+                            <td>{{ venda.preco }}</td>
+                            <td>
+                                <form action="{{ venda.delete_path }}" method="post" onsubmit="return confirm('{{_('Are you sure to delete? Press cancel to avoid deletion.')}}');">
+                                    {{ csrf_input() }}
+                                    <button class="btn btn-danger btn-sm"><i
+                                            class="glyphicon glyphicon-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
