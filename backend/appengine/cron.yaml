@@ -1,4 +1,8 @@
 cron:
+- description: contabilizacao de vendas
+  url: /vendas/tasks/contabilizar
+  schedule: every day 03:00
+
 - description: application secret renew
   url: /cookie/tasks/renew
   schedule: every sunday 04:00
