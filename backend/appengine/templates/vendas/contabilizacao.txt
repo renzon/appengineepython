@@ -1,0 +1,5 @@
+Olá {{ nome }},
+
+A contabilização das vendas na data {{ data }} apresentou o valor de R$ {{ valor }}.
+
+Essa é uma mensagem gerada automaticamente.

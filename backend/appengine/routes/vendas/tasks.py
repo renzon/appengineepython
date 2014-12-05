@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-import logging
+from datetime import date
 from decimal import Decimal
-from google.appengine.api import taskqueue
+
+from google.appengine.api import mail
+
+from config.template import render
+
 from gaebusiness.gaeutil import TaskQueueCommand
 from gaecookie.decorator import no_csrf
+from gaeforms.base import Form, StringField, DateField, DecimalField
 from gaepermission.decorator import login_not_required
+import settings
 from tekton.router import to_path
 from venda_app.venda_facade import contabilizar_venda_cmd
+
 
 
 @login_not_required
@@ -26,4 +33,16 @@ def contabilizar(total='0.00', cursor=None):
                                     params=params)
         task_cmd()
     else:
-        logging.info('Contabilização terminada: %s' % total)
+        class TotalForm(Form):
+            nome = StringField()
+            valor = DecimalField()
+            data = DateField()
+
+        form = TotalForm()
+        dados = form.localize(valor=total,
+                              nome='Renzo',
+                              data=date.today())
+        corpo_email = render('vendas/contabilizacao.txt', dados)
+        mail.send_mail_to_admins(settings.SENDER_EMAIL,
+                                 'Contabilização de Vendas',
+                                 corpo_email)
