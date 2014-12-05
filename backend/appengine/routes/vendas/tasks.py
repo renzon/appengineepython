@@ -16,7 +16,6 @@ from tekton.router import to_path
 from venda_app.venda_facade import contabilizar_venda_cmd
 
 
-
 @login_not_required
 @no_csrf
 def contabilizar(total='0.00', cursor=None):
@@ -43,6 +42,7 @@ def contabilizar(total='0.00', cursor=None):
                               nome='Renzo',
                               data=date.today())
         corpo_email = render('vendas/contabilizacao.txt', dados)
-        mail.send_mail_to_admins(settings.SENDER_EMAIL,
-                                 'Contabilização de Vendas',
-                                 corpo_email)
+        mail.send_mail(settings.SENDER_EMAIL,
+                       'renzo@python.pro.br',
+                       'Contabilização de Vendas',
+                       corpo_email)
