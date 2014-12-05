@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 from gaegraph.business_base import NodeSearch, DeleteNode
-from venda_app.venda_commands import ListVendaCommand, SaveVendaCommand, UpdateVendaCommand, VendaForm
+from venda_app.venda_commands import ListVendaCommand, SaveVendaCommand, UpdateVendaCommand, VendaForm, \
+    ContabilizarVenda
+
+
+def contabilizar_venda_cmd(cursor=None):
+    return ContabilizarVenda(cursor)
 
 
 def save_venda_cmd(**venda_properties):
@@ -46,7 +51,6 @@ def get_venda_cmd(venda_id):
     :return: Command
     """
     return NodeSearch(venda_id)
-
 
 
 def delete_venda_cmd(venda_id):

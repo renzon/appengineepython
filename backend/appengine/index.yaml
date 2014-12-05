@@ -41,4 +41,10 @@ indexes:
 - kind: Node
   properties:
   - name: class
+  - name: status
+  - name: creation
+
+- kind: Node
+  properties:
+  - name: class
   - name: titulo
