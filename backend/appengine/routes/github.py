@@ -20,7 +20,8 @@ def index(usuario='renzon'):
     resultado_repos = urlfetch.fetch(url=url_repos, headers=headers)
     usuario_dct = json.loads(resultado_usuario.content)
     repos_list = json.loads(resultado_repos.content)
-    repos_list = repos_list[:7]
+    if len(repos_list) > 7:
+        repos_list = repos_list[:7]
     logging.info(repr(repos_list))
     contexto = {'usuario': usuario,
                 'avatar': usuario_dct['avatar_url'],
