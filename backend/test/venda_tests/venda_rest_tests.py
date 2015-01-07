@@ -17,7 +17,7 @@ class IndexTests(GAETestCase):
         context = json_response.context
         self.assertEqual(2, len(context))
         venda_dct = context[0]
-        self.assertSetEqual(set(['id', 'creation', 'preco']), set(venda_dct.iterkeys()))
+        self.assertSetEqual(set(['id', 'creation', 'preco','status']), set(venda_dct.iterkeys()))
         self.assert_can_serialize_as_json(json_response)
 
 
