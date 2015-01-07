@@ -1,0 +1,17 @@
+{% extends 'base/base.html' %}
+{% block body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="text-center">Perfil de Github de {{ usuario }}</h1>
+      </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="row">
+      <div class="col-md-4">
+        <img src="{{ avatar }}" width="200px"/>
+      </div>
+    </div>
+  </div>
+{% endblock %}
