@@ -8,9 +8,18 @@
     </div>
     <br/>
     <br/>
+
     <div class="row">
       <div class="col-md-4">
         <img src="{{ avatar }}" width="200px"/>
+      </div>
+      <div class="col-md-6">
+        <h2>Repositórios</h2>
+        <ol>
+          {% for repo in repos %}
+            <li><a href="{{ repo.html_url }}">{{ repo.name }}</a></li>
+          {% endfor %}
+        </ol>
       </div>
     </div>
   </div>
