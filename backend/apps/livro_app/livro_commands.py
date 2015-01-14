@@ -18,13 +18,19 @@ class LivroForm(ModelForm):
 
 # Comandos
 class ApagarAutorArcoCmd(DeleteArcs):
+    arc_class = AutorArco
+
     def __init__(self, livro):
-        super(ApagarAutorArcoCmd, self).__init__(AutorArco, destination=livro)
+        super(ApagarAutorArcoCmd, self).__init__(destination=livro)
+
+
+class _ApagarLIvroCmd(DeleteNode):
+    _model_class = Livro
 
 
 class ApagarLivroCmd(CommandParallel):
     def __init__(self, livro):
-        delete_cmd = DeleteNode(livro)
+        delete_cmd = _ApagarLIvroCmd(livro)
         apagar_autor_arco_cmd = ApagarAutorArcoCmd(livro)
         super(ApagarLivroCmd, self).__init__(delete_cmd, apagar_autor_arco_cmd)
 
@@ -42,8 +48,7 @@ class AtualizarLivroCmd(UpdateNode):
 
 
 class SalvarLivroComAutor(CreateSingleOriginArc):
-    def __init__(self, origin, destination):
-        super(SalvarLivroComAutor, self).__init__(AutorArco, origin, destination)
+    arc_class = AutorArco
 
 
 class ListarLivrosOrdenadosPorTituloCmd(ModelSearchCommand):
@@ -52,8 +57,7 @@ class ListarLivrosOrdenadosPorTituloCmd(ModelSearchCommand):
 
 
 class BuscarAutor(SingleOriginSearch):
-    def __init__(self, livro):
-        super(BuscarAutor, self).__init__(AutorArco, livro)
+    arc_class = AutorArco
 
 
 class BuscarAutoresCmd(CommandParallel):
