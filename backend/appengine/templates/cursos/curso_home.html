@@ -1,72 +1,40 @@
 {% extends 'cursos/curso_base.html' %}
-{% block js %}
-    <script type="text/javascript" src="/static/angular/js/angular.min.js"></script>
-    <script type="text/javascript" src="/static/curso/js/curso_crud.js"></script>
-    <script type="text/javascript">
-        var curso_rest = angular.module('curso_rest', []);
-
-        curso_rest.factory('CursoAPI', ['$http', function ($http) {
-            return {
-                salvar: function (curso) {
-                    return $http.post('{{ salvar_path }}', curso);
-                },
-                listar: function () {
-                    return $http.post('{{ listar_path }}');
-                },
-                editar: function (curso) {
-                    return $http.post('{{ editar_path }}', curso);
-                },
-                apagar: function (id) {
-                    return $http.post('{{ apagar_path }}', {'id':id});
-                }
-            };
-        }]);
-
-
-    </script>
-{% endblock %}
 {% block body %}
-    <div class="container" ng-app="curso_crud" ng-controller="CursoController">
-        <curso-edit-form id="editform"
-                         curso="cursoParaEdicao"
-                         curso-editado-handler="esconderFormEdicao()">
-        </curso-edit-form>
+    <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <h1>{% trans %}This is a generic home for curso_app {% endtrans %}  </h1>
-                <button class="btn btn-success" ng-click="alterarVisibilidadeDeFormDeCurso()">{% trans %}Create New
-                    Curso{% endtrans %}</button>
-            </div>
-        </div>
-        <div class="row" ng-show="mostrarCursoFormFlag">
-            <div class="col-md-6 col-md-offset-3">
-                <div class="well">
-                    <h1 class="text-center">Formulário de Curso</h1>
-                    <cursoform curso-salvo-handler="adicionarCurso(curso)"></cursoform>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <hr/>
-            <div class="col-md-12">
-
+                <a href="{{ new_path }}" class="btn btn-success">{% trans %}Create New Curso{% endtrans %}</a>
+                <hr/>
                 <h2>{% trans %}List of Cursos{% endtrans %}</h2>
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
                         <th/>
-                        <th>{% trans %}Titulo{% endtrans %}</th>
-                        <th>{% trans %}Preco{% endtrans %}</th>
                         <th>{% trans %}Id{% endtrans %}</th>
                         <th>{% trans %}Creation{% endtrans %}</th>
-                        <th/>
+                        <th>{% trans %}Preco{% endtrans %}</th>
+                        <th>{% trans %}Nome{% endtrans %}</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr cursolinha ng-repeat="curso in cursos"
-                        curso="curso"
-                        apagar-curso-handler="removerCurso($index)"
-                        editar-curso="editarCurso(curso)"></tr>
+                    {% for curso in cursos %}
+                        <tr>
+                            <td><a href="{{ curso.edit_path }}" class="btn btn-success btn-sm"><i
+                                    class="glyphicon glyphicon-pencil"></i></a></td>
+                            <td>{{ curso.id }}</td>
+                            <td>{{ curso.creation }}</td>
+                            <td>{{ curso.preco }}</td>
+                            <td>{{ curso.nome }}</td>
+                            <td>
+                                <form action="{{ curso.delete_path }}" method="post" onsubmit="return confirm('{{_('Are you sure to delete? Press cancel to avoid deletion.')}}');">
+                                    {{ csrf_input() }}
+                                    <button class="btn btn-danger btn-sm"><i
+                                            class="glyphicon glyphicon-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>

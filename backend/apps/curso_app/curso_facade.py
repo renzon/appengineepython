@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 from gaegraph.business_base import NodeSearch, DeleteNode
-from curso_app.curso_commands import ListCursoCommand, SaveCursoCommand, UpdateCursoCommand, CursoForm
+from curso_app.curso_commands import ListCursoCommand, SaveCursoCommand, UpdateCursoCommand, CursoForm,\
+    GetCursoCommand, DeleteCursoCommand
 
 
 def save_curso_cmd(**curso_properties):
@@ -45,7 +46,7 @@ def get_curso_cmd(curso_id):
     :param curso_id: the curso id
     :return: Command
     """
-    return NodeSearch(curso_id)
+    return GetCursoCommand(curso_id)
 
 
 
@@ -55,5 +56,5 @@ def delete_curso_cmd(curso_id):
     :param curso_id: curso's id
     :return: Command
     """
-    return DeleteNode(curso_id)
+    return DeleteCursoCommand(curso_id)
 

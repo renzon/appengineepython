@@ -6,6 +6,6 @@ from gaeforms.ndb import property
 
 
 class Curso(Node):
-    titulo = ndb.StringProperty(required=True)
+    nome = ndb.StringProperty(required=True)
     preco = property.SimpleCurrency(required=True)
 
