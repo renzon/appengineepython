@@ -10,11 +10,6 @@ from routes.updown import upload
 
 @no_csrf
 def index():
-    """
-    This is a example of file upload using
-    Google Cloud Storage
-    :return:
-    """
     success_url = router.to_path(upload)
     bucket = get_default_gcs_bucket_name()
     url = blobstore.create_upload_url(success_url, gs_bucket_name=bucket)

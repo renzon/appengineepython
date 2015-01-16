@@ -15,6 +15,45 @@
             </div>
             <button type="submit" class="btn btn-success">{% trans %}Upload{% endtrans %}</button>
           </form>
+
+          <h2>Lista de Arquivos</h2>
+          <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+              <th>Imagem</th>
+              <th>Criação</th>
+              <th>Arquivo</th>
+              <th>Tipo de Conteúdo</th>
+              <th>Tamanho</th>
+              <th>Hash</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for blob_file in blob_files %}
+              <tr>
+                <td>{% if blob_file.img %}
+                  <img src="{{ blob_file.img }}" max-w/>
+                {% else %}
+                  N/A
+                {% endif %}
+                </td>
+                <td>{{ blob_file.creation }}</td>
+                <td>{{ blob_file.filename }}</td>
+                <td>{{ blob_file.content_type }}</td>
+                <td>{{ blob_file.size }}</td>
+                <td>{{ blob_file.md5 }}</td>
+                <td>
+                  <form action="{{ blob_file.delete_path }}" method="post"
+                        onsubmit="return confirm('{{ _('Are you sure to delete? Press cancel to avoid deletion.') }}');">
+                    {{ csrf_input() }}
+                    <button class="btn btn-danger btn-sm"><i
+                            class="glyphicon glyphicon-trash"></i></button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
