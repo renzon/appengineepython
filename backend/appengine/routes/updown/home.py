@@ -38,5 +38,5 @@ def index(_logged_user):
 
 
 def delete(blob_file_id):
-    blob_facade.delete_blob_file_cmd(blob_file_id)()
+    blob_facade.delete_blob_file_cmd(blob_file_id).execute()
     return RedirectResponse(router.to_path(index))
