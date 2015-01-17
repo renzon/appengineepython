@@ -24,7 +24,7 @@ def index(_logged_user):
     blob_file_form = blob_facade.blob_file_form()
 
     def localize_blob_file(blob_file):
-        blob_file_dct = blob_file_form.fill_with_model(blob_file)
+        blob_file_dct = blob_file_form.fill_with_model(blob_file, 64)
         blob_file_dct['delete_path'] = router.to_path(delete_path, blob_file_dct['id'])
         blob_file_dct['download_path'] = router.to_path(download_path,
                                                         blob_file.blob_key,

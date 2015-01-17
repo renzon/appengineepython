@@ -37,9 +37,9 @@
                   </a>
                 </td>
                 <td>{% if blob_file.img %}
-                  <img src="{{ blob_file.img }}" width="32px"/>
+                  <img src="{{ blob_file.img }}" width="64px"/>
                 {% else %}
-                  N/A
+                  Não se aplica
                 {% endif %}
                 </td>
                 <td>{{ blob_file.creation }}</td>
@@ -48,7 +48,7 @@
                 <td>{{ blob_file.size }}</td>
                 <td>
                   <form action="{{ blob_file.delete_path }}" method="post"
-                        onsubmit="return confirm('{{ _('Are you sure to delete? Press cancel to avoid deletion.') }}');">
+                        onsubmit="return confirm('{{ _('Tem certeza que deseja apagar o arquivo? Pressione cancelar para evitar a deleção.') }}');">
                     {{ csrf_input() }}
                     <button class="btn btn-danger btn-sm"><i
                             class="glyphicon glyphicon-trash"></i></button>
