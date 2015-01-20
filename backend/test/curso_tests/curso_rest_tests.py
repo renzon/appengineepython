@@ -24,6 +24,14 @@ class IndexTests(GAETestCase):
 
 
 class NewTests(GAETestCase):
+    def test_error(self):
+        resp = Mock()
+        json_response = rest.new(resp)
+        errors = json_response.context
+        self.assertEqual(500, resp.status_code)
+        self.assertSetEqual(set(['preco', 'nome']), set(errors.keys()))
+        self.assert_can_serialize_as_json(json_response)
+
     def test_success(self):
         self.assertIsNone(Curso.query().get())
         json_response = rest.new(None, preco='1.01', nome='nome_string')
@@ -31,14 +39,6 @@ class NewTests(GAETestCase):
         self.assertIsNotNone(db_curso)
         self.assertEquals(Decimal('1.01'), db_curso.preco)
         self.assertEquals('nome_string', db_curso.nome)
-        self.assert_can_serialize_as_json(json_response)
-
-    def test_error(self):
-        resp = Mock()
-        json_response = rest.new(resp)
-        errors = json_response.context
-        self.assertEqual(500, resp.status_code)
-        self.assertSetEqual(set(['preco', 'nome']), set(errors.keys()))
         self.assert_can_serialize_as_json(json_response)
 
 
