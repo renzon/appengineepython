@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
+from base import GAETestCase
 from unittest.case import TestCase
 from livro_app.livro_commands import BuscarLivroPorIdCmd
 
