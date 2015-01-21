@@ -12,7 +12,7 @@ USER_REPOS_JSON = '''[{"id":19279089,"name":"angular","full_name":"renzon/angula
 class WebServiceTests(GAETestCase):
     @patch('routes.github.CommandParallel')
     @patch('routes.github.UrlFetchCommand')
-    def test_acesso_github(self, UrlFetchCommandMock, CommandParallelMock):
+    def test_acesso_github(self, UrlFetchCommandClassMock, CommandParallelClassMock):
         user_cmd = Mock()
         user_cmd.result.content = USER_JSON
         repos_cmd = Mock()
@@ -22,6 +22,10 @@ class WebServiceTests(GAETestCase):
         def side_efects(*arks, **kwargs):
             return cmds.pop(0)
 
-        UrlFetchCommandMock.side_effect = side_efects
+        cmd_parallel = Mock()
+        CommandParallelClassMock.return_value = cmd_parallel
+        UrlFetchCommandClassMock.side_effect = side_efects
         response = github.index('renzon')
+        CommandParallelClassMock.assert_called_once_with(user_cmd, repos_cmd)
+        cmd_parallel.execute.assert_called_once_with()
         self.assert_can_render(response)
