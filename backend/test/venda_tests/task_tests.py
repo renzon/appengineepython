@@ -25,9 +25,9 @@ class ContabilizarTests(GAETestCase):
         def _contabilizar():
             params = TaskQueueCommandClassMock.call_args[1]['params']
             subtotal = params['total']
-            i = subtotais['i']
-            self.assertEqual(subtotais[i], subtotal)
-            subtotais['i'] = subtotais['i'] + 1
+            execucao = subtotais['i']
+            self.assertEqual(subtotais[execucao], subtotal)
+            subtotais['i'] = execucao + 1
             contabilizar(subtotal,
                          params['cursor'])
 

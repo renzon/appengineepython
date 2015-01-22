@@ -61,6 +61,7 @@ class BlobstoreTestCase(GAETestCase):
         GAETestCase.setUp(self)
         self.testbed.init_blobstore_stub()
         self.testbed.init_files_stub()
+        self.testbed.init_images_stub()
 
     def save_blob(self, blobdata='blobdata'):
         file_name = files.blobstore.create(mime_type='application/octet-stream')
